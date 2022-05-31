@@ -1,37 +1,42 @@
 package com.company.data;
 
+import com.company.entity.DbColumn;
+import com.company.repository.DbColumnRepository;
 import com.company.utility.BankAccountUtility;
 import com.company.utility.CompanyUtility;
 import com.company.utility.PortfolioUtility;
 import com.company.utility.UserUtility;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.google.gson.Gson;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Stream;
 
-@Component
-public class DataUtility {
+@Service
+@Slf4j
+public class DataService {
 
     private final PortfolioUtility portfolioUtility;
     private final BankAccountUtility bankAccountUtility;
     private final UserUtility userUtility;
     private final CompanyUtility companyUtility;
+    private final DbColumnRepository dbColumnRepository;
 
-    @Autowired
-    public DataUtility(
+    public DataService(
             final PortfolioUtility portfolioUtility,
             final BankAccountUtility bankAccountUtility,
             final UserUtility userUtility,
-            final CompanyUtility companyUtility
-    ) {
+            final CompanyUtility companyUtility,
+            final DbColumnRepository dbColumnRepository
+            ) {
         this.portfolioUtility = portfolioUtility;
         this.bankAccountUtility = bankAccountUtility;
         this.userUtility = userUtility;
         this.companyUtility = companyUtility;
+        this.dbColumnRepository = dbColumnRepository;
     }
 
     public Map<String, List<Object>> loadCache() throws ParseException {
@@ -54,23 +59,70 @@ public class DataUtility {
 
     /**
      * To flatten a map containing a list of items as values
-     *
      */
     public <T> Stream<T> flatten(Collection<List<T>> values) {
         return values.stream().flatMap(Collection::stream);
     }
 
     /**
-     * Display flatten Json
+     * Get Flattened Json
      *
      * @param cache
+     * @return
      */
-    public void displayFlattenedJson(Map<String, List<Object>> cache) {
+    public Map<String, Object> getFlattenedJson(Map<String, List<Object>> cache) {
         Gson gson = new Gson();
         String jsonString = gson.toJson(cache);
-        String flattenedJson = JsonFlattener.flatten(jsonString);
+        String flattenedJsonString = JsonFlattener.flatten(jsonString);
         Map<String, Object> flattenedJsonMap = JsonFlattener.flattenAsMap(jsonString);
+        LOGGER.info("Flattened Json String : {}", flattenedJsonString);
         flattenedJsonMap.forEach((k, v) -> System.out.println(k + " " + v));
+        return flattenedJsonMap;
+    }
+
+    public Map<String, List<Object>> parseJson(){
+        Map<String, List<Object>> cache = new LinkedHashMap<>();
+        try {
+            cache = loadCache();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        cache.forEach((k, v) -> System.out.println(k + " " + v));
+
+        DbColumn dbColumn = DbColumn.builder()
+                .id(1)
+                .name("Name")
+                .label("Name")
+                .type("String")
+                .groupedValues(getGroupedValues())
+                .build();
+
+        dbColumnRepository.save(dbColumn);
+
+        return cache;
+    }
+
+    public void performTransformation() {
+
+
+
+
+    }
+
+    public List<List<String>> getGroupedValues(){
+        List<List<String>> groupedValues = new LinkedList<>();
+
+        List<String> record1 = new LinkedList<>();
+        record1.add("A");
+        record1.add("B");
+        List<String> record2 = new LinkedList<>();
+        record2.add("C");
+        record2.add("D");
+        groupedValues.add(record1);
+        groupedValues.add(record2);
+
+        return groupedValues;
     }
 
 }

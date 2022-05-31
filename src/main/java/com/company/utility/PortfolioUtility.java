@@ -1,8 +1,8 @@
 package com.company.utility;
 
-import com.company.model.Currency;
-import com.company.model.Portfolio;
-import com.company.model.Position;
+import com.company.dto.Currency;
+import com.company.dto.PortfolioDto;
+import com.company.dto.PositionDto;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -18,10 +18,10 @@ public class PortfolioUtility {
     public PortfolioUtility() {
     }
 
-    public List<Portfolio> loadPortfolios() throws ParseException {
-        List<Portfolio> portfolios = new LinkedList<>();
+    public List<PortfolioDto> loadPortfolios() throws ParseException {
+        List<PortfolioDto> portfolios = new LinkedList<>();
 
-        Portfolio conservative_portfolio = Portfolio.builder()
+        PortfolioDto conservative_portfolio = PortfolioDto.builder()
                 .id(21L)
                 .portfolioId("1001")
                 .portfolioName("Conservative Portfolio")
@@ -32,7 +32,7 @@ public class PortfolioUtility {
                 .positions(getPositionsForConservativePortfolio())
                 .build();
 
-        Portfolio aggressive_portfolio = Portfolio.builder()
+        PortfolioDto aggressive_portfolio = PortfolioDto.builder()
                 .id(20L)
                 .portfolioId("1002")
                 .portfolioName("Aggressive Portfolio")
@@ -53,10 +53,10 @@ public class PortfolioUtility {
         return new SimpleDateFormat("yyyyMMdd").parse("20201230");
     }
 
-    public List<Position> getPositionsForConservativePortfolio() throws ParseException {
-        List<Position> positions = new LinkedList<>();
+    public List<PositionDto> getPositionsForConservativePortfolio() throws ParseException {
+        List<PositionDto> positions = new LinkedList<>();
 
-        Position position_start_of_month = Position.builder()
+        PositionDto position_start_of_month = PositionDto.builder()
                 .id(1L)
                 .portfolioId("1001")
                 .portfolioName("Conservative Portfolio")
@@ -67,7 +67,7 @@ public class PortfolioUtility {
                 .endDate(getEndDateTimeStartOfMonth())
                 .build();
 
-        Position position_end_of_month = Position.builder()
+        PositionDto position_end_of_month = PositionDto.builder()
                 .id(2L)
                 .portfolioId("1001")
                 .portfolioName("Conservative Portfolio")
@@ -100,10 +100,10 @@ public class PortfolioUtility {
         return new SimpleDateFormat("yyyyMMdd").parse("20201230");
     }
 
-    public List<Position> getPositionsForAggressivePortfolio() throws ParseException {
-        List<Position> positions = new LinkedList<>();
+    public List<PositionDto> getPositionsForAggressivePortfolio() throws ParseException {
+        List<PositionDto> positions = new LinkedList<>();
 
-        Position position_start_of_month = Position.builder()
+        PositionDto position_start_of_month = PositionDto.builder()
                 .id(1L)
                 .portfolioId("1002")
                 .portfolioName("Aggressive Portfolio")
@@ -114,7 +114,7 @@ public class PortfolioUtility {
                 .endDate(getEndDateTimeStartOfMonth())
                 .build();
 
-        Position position_end_of_month = Position.builder()
+        PositionDto position_end_of_month = PositionDto.builder()
                 .id(2L)
                 .portfolioId("1001")
                 .portfolioName("Conservative Portfolio")

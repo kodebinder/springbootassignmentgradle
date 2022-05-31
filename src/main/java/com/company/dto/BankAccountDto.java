@@ -1,4 +1,4 @@
-package com.company.model;
+package com.company.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +11,11 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BankAccount {
+public class BankAccountDto {
     private long id;
     private String bankAccountId;
     private String bankAccountNumber;
     private boolean isActive;
     private BigDecimal balance;
-    private BankOperation bankOperation;
+    private BankOperationDto bankOperation;
 }

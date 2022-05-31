@@ -1,7 +1,7 @@
 package com.company.utility;
 
-import com.company.model.BankAccount;
-import com.company.model.BankOperation;
+import com.company.dto.BankAccountDto;
+import com.company.dto.BankOperationDto;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -14,42 +14,42 @@ public class BankAccountUtility {
     public BankAccountUtility() {
     }
 
-    public List<BankAccount> loadBankAccounts() {
-        List<BankAccount> bankAccounts = new LinkedList<>();
+    public List<BankAccountDto> loadBankAccounts() {
+        List<BankAccountDto> bankAccounts = new LinkedList<>();
 
-        BankAccount iciciBankAccount = BankAccount.builder()
+        BankAccountDto iciciBankAccount = BankAccountDto.builder()
                 .id(9L)
                 .bankAccountId("ICICI1001")
                 .bankAccountNumber("501000607812345")
                 .isActive(Boolean.TRUE)
                 .balance(new BigDecimal(70000))
-                .bankOperation(BankOperation.builder()
+                .bankOperation(BankOperationDto.builder()
                         .id(1L)
                         .bankAccountId("ICICI1001")
                         .isDebitEnabled(Boolean.TRUE)
                         .isCreditEnabled(Boolean.TRUE)
                         .build()).build();
 
-        BankAccount axisBankAccount = BankAccount.builder()
+        BankAccountDto axisBankAccount = BankAccountDto.builder()
                 .id(8L)
                 .bankAccountId("AXIS9001")
                 .bankAccountNumber("801000607867890")
                 .isActive(Boolean.TRUE)
                 .balance(new BigDecimal(50000))
-                .bankOperation(BankOperation.builder()
+                .bankOperation(BankOperationDto.builder()
                         .id(2L)
                         .bankAccountId("AXIS9001")
                         .isDebitEnabled(Boolean.TRUE)
                         .isCreditEnabled(Boolean.TRUE)
                         .build()).build();
 
-        BankAccount sbiBankAccount = BankAccount.builder()
+        BankAccountDto sbiBankAccount = BankAccountDto.builder()
                 .id(3L)
                 .bankAccountId("SBI7004")
                 .bankAccountNumber("700000607879797")
                 .isActive(Boolean.TRUE)
                 .balance(new BigDecimal(10000))
-                .bankOperation(BankOperation.builder()
+                .bankOperation(BankOperationDto.builder()
                         .id(3L)
                         .bankAccountId("SBI7004")
                         .isDebitEnabled(Boolean.TRUE)

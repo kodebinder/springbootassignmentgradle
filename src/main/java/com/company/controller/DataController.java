@@ -1,7 +1,8 @@
 package com.company.controller;
 
-import com.company.data.DataUtility;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.company.data.DataService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,22 +15,28 @@ import java.util.Map;
 @RequestMapping("/api/v1")
 public class DataController {
 
-    private final DataUtility dataUtility;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataController.class);
 
-    @Autowired
+    private final DataService dataService;
+
     public DataController(
-            final DataUtility dataUtility
+            final DataService dataService
     ) {
-        this.dataUtility = dataUtility;
+        this.dataService = dataService;
     }
 
     @GetMapping("/data")
     public Map<String, List<Object>> getCache() throws ParseException {
-        return dataUtility.loadCache();
+        return dataService.loadCache();
     }
 
     @GetMapping("/flatten-data")
-    public void displayFlattenData() throws ParseException {
-        dataUtility.displayFlattenedJson(dataUtility.loadCache());
+    public Map<String, Object> displayFlattenData() throws ParseException {
+        return dataService.getFlattenedJson(dataService.loadCache());
+    }
+
+    @GetMapping("/parse-json")
+    public Map<String, List<Object>> parseJson(){
+       return dataService.parseJson();
     }
 }

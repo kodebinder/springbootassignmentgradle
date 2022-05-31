@@ -1,6 +1,6 @@
 package com.company.utility;
 
-import com.company.model.Company;
+import com.company.dto.CompanyDto;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
@@ -12,10 +12,10 @@ public class CompanyUtility {
     public CompanyUtility() {
     }
 
-    public List<Company> loadCompanies() {
-        List<Company> companies = new LinkedList<>();
+    public List<CompanyDto> loadCompanies() {
+        List<CompanyDto> companies = new LinkedList<>();
 
-        Company reliance = Company.builder()
+        CompanyDto reliance = CompanyDto.builder()
                 .id(7L)
                 .companyId("Company-Reliance")
                 .companyName("Reliance Industry")
@@ -24,7 +24,7 @@ public class CompanyUtility {
                 .yearOfEstablishment(1966)
                 .build();
 
-        Company tata = Company.builder()
+        CompanyDto tata = CompanyDto.builder()
                 .id(4L)
                 .companyId("Company-Tata")
                 .companyName("Tata Group")
@@ -33,7 +33,7 @@ public class CompanyUtility {
                 .yearOfEstablishment(1868)
                 .build();
 
-        Company itc = Company.builder()
+        CompanyDto itc = CompanyDto.builder()
                 .id(3L)
                 .companyId("Company-ITC")
                 .companyName("Imperial Tobacco Company of India Limited")

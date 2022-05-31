@@ -1,4 +1,4 @@
-package com.company.model;
+package com.company.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Address {
+public class AddressDto {
     private long id;
     private String addressId;
     private String addressType;

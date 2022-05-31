@@ -1,4 +1,4 @@
-package com.company.model;
+package com.company.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class UserDto {
     private long id;
-    private Address address;
+    private AddressDto address;
     private List<String> mobileNumbers;
     private String email;
     private String userFirstName;

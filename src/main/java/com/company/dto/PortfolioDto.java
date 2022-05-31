@@ -1,4 +1,4 @@
-package com.company.model;
+package com.company.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,10 +13,10 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Portfolio {
+public class PortfolioDto {
     private long id;
     private boolean isActive;
-    private List<Position> positions;
+    private List<PositionDto> positions;
     private BigDecimal fundSize;
     private Date creationDate;
     private Currency currency;

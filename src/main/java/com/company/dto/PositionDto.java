@@ -1,4 +1,4 @@
-package com.company.model;
+package com.company.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Position {
+public class PositionDto {
     private long id;
     private int numberShares;
     private int positionMarketValue;

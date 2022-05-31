@@ -1,7 +1,7 @@
 package com.company.utility;
 
-import com.company.model.Address;
-import com.company.model.User;
+import com.company.dto.AddressDto;
+import com.company.dto.UserDto;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -14,17 +14,17 @@ public class UserUtility {
     public UserUtility() {
     }
 
-    public List<User> loadUsers() {
-        List<User> users = new LinkedList<>();
+    public List<UserDto> loadUsers() {
+        List<UserDto> users = new LinkedList<>();
 
-        User john = User.builder()
+        UserDto john = UserDto.builder()
                 .id(7L)
                 .userId("1001")
                 .userFirstName("john")
                 .userLastName("wright")
                 .email("john.wright@gmail.com")
                 .mobileNumbers(Arrays.asList("5555551234.", "5555555678"))
-                .address(Address.builder()
+                .address(AddressDto.builder()
                         .id(1L)
                         .addressId("101")
                         .addressType("Office")
@@ -32,14 +32,14 @@ public class UserUtility {
                         .street("12 Main").state("Illinois").country("USA").zip("60603").build())
                 .build();
 
-        User mark = User.builder()
+        UserDto mark = UserDto.builder()
                 .id(5L)
                 .userId("1007")
                 .userFirstName("mark")
                 .userLastName("johnson")
                 .email("mark.johnson@gmail.com")
                 .mobileNumbers(Arrays.asList("5555551898", "5555551890"))
-                .address(Address.builder()
+                .address(AddressDto.builder()
                         .id(2L)
                         .addressId("678")
                         .addressType("Home")
