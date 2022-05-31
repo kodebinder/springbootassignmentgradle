@@ -57,6 +57,7 @@ public class PortfolioUtility {
         List<Position> positions = new LinkedList<>();
 
         Position position_start_of_month = Position.builder()
+                .id(1L)
                 .portfolioId("1001")
                 .portfolioName("Conservative Portfolio")
                 .currency(Currency.GBP)
@@ -67,6 +68,7 @@ public class PortfolioUtility {
                 .build();
 
         Position position_end_of_month = Position.builder()
+                .id(2L)
                 .portfolioId("1001")
                 .portfolioName("Conservative Portfolio")
                 .currency(Currency.GBP)
@@ -102,6 +104,7 @@ public class PortfolioUtility {
         List<Position> positions = new LinkedList<>();
 
         Position position_start_of_month = Position.builder()
+                .id(1L)
                 .portfolioId("1002")
                 .portfolioName("Aggressive Portfolio")
                 .currency(Currency.GBP)
@@ -112,6 +115,7 @@ public class PortfolioUtility {
                 .build();
 
         Position position_end_of_month = Position.builder()
+                .id(2L)
                 .portfolioId("1001")
                 .portfolioName("Conservative Portfolio")
                 .currency(Currency.GBP)
