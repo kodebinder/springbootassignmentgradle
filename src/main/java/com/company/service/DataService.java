@@ -9,6 +9,7 @@ import com.company.utility.UserUtility;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -25,18 +26,22 @@ public class DataService {
     private final CompanyUtility companyUtility;
     private final DbColumnRepository dbColumnRepository;
 
+    private final ModelMapper modelMapper;
+
     public DataService(
             final PortfolioUtility portfolioUtility,
             final BankAccountUtility bankAccountUtility,
             final UserUtility userUtility,
             final CompanyUtility companyUtility,
-            final DbColumnRepository dbColumnRepository
-            ) {
+            final DbColumnRepository dbColumnRepository,
+            final ModelMapper modelMapper
+    ) {
         this.portfolioUtility = portfolioUtility;
         this.bankAccountUtility = bankAccountUtility;
         this.userUtility = userUtility;
         this.companyUtility = companyUtility;
         this.dbColumnRepository = dbColumnRepository;
+        this.modelMapper = modelMapper;
     }
 
     public Map<String, List<Object>> loadCache() throws ParseException {
@@ -80,7 +85,7 @@ public class DataService {
         return flattenedJsonMap;
     }
 
-    public Map<String, List<Object>> parseJson(){
+    public Map<String, List<Object>> parseJson() {
         Map<String, List<Object>> cache = new LinkedHashMap<>();
         try {
             cache = loadCache();
@@ -106,11 +111,9 @@ public class DataService {
     public void performTransformation() {
 
 
-
-
     }
 
-    public List<List<String>> getGroupedValues(){
+    public List<List<String>> getGroupedValues() {
         List<List<String>> groupedValues = new LinkedList<>();
 
         List<String> record1 = new LinkedList<>();
