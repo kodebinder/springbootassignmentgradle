@@ -14,7 +14,7 @@ import java.util.List;
 @Table
 @NoArgsConstructor
 @AllArgsConstructor
-public class DbColumn {
+public class BaseDbColumn {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;

@@ -27,16 +27,21 @@ public class DataController {
 
     @GetMapping("/data")
     public Map<String, List<Object>> getCache() throws ParseException {
-        return dataService.loadCache();
+        return dataService.getCache();
     }
 
     @GetMapping("/flatten-data")
     public Map<String, Object> displayFlattenData() throws ParseException {
-        return dataService.getFlattenedJson(dataService.loadCache());
+        return dataService.getFlattenedJson(dataService.getCache());
     }
 
     @GetMapping("/parse-json")
-    public Map<String, List<Object>> parseJson(){
-       return dataService.parseJson();
+    public Map<String, List<Object>> parseJson() {
+        return dataService.parseJson();
+    }
+
+    @GetMapping("/createBaseDbColumns")
+    public void createBaseDbColumns() throws ParseException {
+        dataService.createBaseDbColumnsFromDto();
     }
 }

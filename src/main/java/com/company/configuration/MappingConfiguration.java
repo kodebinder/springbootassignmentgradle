@@ -3,69 +3,76 @@ package com.company.configuration;
 import com.company.dto.*;
 import com.company.entity.*;
 import org.modelmapper.ModelMapper;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MappingConfiguration {
 
-    private final ModelMapper modelMapper;
-
-    public MappingConfiguration(final ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-    }
-
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
+//    private final ModelMapper modelMapper;
+//
+//    public MappingConfiguration(final ModelMapper modelMapper) {
+//        this.modelMapper = modelMapper;
+//    }
+//
+//    @Bean
+//    public ModelMapper modelMapper() {
+//        return new ModelMapper();
+//    }
 
     public Address mapAddressDtoToAddressEntity(AddressDto addressDto) {
-        return modelMapper.map(addressDto, Address.class);
+        return new ModelMapper().map(addressDto, Address.class);
     }
 
     public AddressDto mapAddressEntityToAddressDto(Address address) {
-        return modelMapper.map(address, AddressDto.class);
+        return new ModelMapper().map(address, AddressDto.class);
     }
 
     public BankAccount mapBankAccountDtoToBankAccountEntity(BankAccountDto bankAccountDto) {
-        return modelMapper.map(bankAccountDto, BankAccount.class);
+        return new ModelMapper().map(bankAccountDto, BankAccount.class);
     }
 
     public BankAccountDto mapBankAccountEntityToBankAccountDto(BankAccount bankAccount) {
-        return modelMapper.map(bankAccount, BankAccountDto.class);
+        return new ModelMapper().map(bankAccount, BankAccountDto.class);
+    }
+
+    public BankOperation mapBankOperationDtoToBankOperationEntity(BankOperationDto bankOperationDto) {
+        return new ModelMapper().map(bankOperationDto, BankOperation.class);
+    }
+
+    public BankOperationDto mapBankOperationEntityToBankOperationDto(BankOperation bankOperation) {
+        return new ModelMapper().map(bankOperation, BankOperationDto.class);
     }
 
     public Company mapCompanyDtoToCompanyEntity(CompanyDto companyDto) {
-        return modelMapper.map(companyDto, Company.class);
+        return new ModelMapper().map(companyDto, Company.class);
     }
 
     public CompanyDto mapCompanyEntityToCompanyDto(Company company) {
-        return modelMapper.map(company, CompanyDto.class);
+        return new ModelMapper().map(company, CompanyDto.class);
     }
 
     public Portfolio mapPortfolioDtoToPortfolioEntity(PortfolioDto portfolioDto) {
-        return modelMapper.map(portfolioDto, Portfolio.class);
+        return new ModelMapper().map(portfolioDto, Portfolio.class);
     }
 
     public PortfolioDto mapPortfolioEntityToPortfolioDto(Portfolio portfolio) {
-        return modelMapper.map(portfolio, PortfolioDto.class);
+        return new ModelMapper().map(portfolio, PortfolioDto.class);
     }
 
     public Position mapPositionDtoToPositionEntity(PositionDto positionDto) {
-        return modelMapper.map(positionDto, Position.class);
+        return new ModelMapper().map(positionDto, Position.class);
     }
 
     public PositionDto mapPositionEntityToPositionDto(Position position) {
-        return modelMapper.map(position, PositionDto.class);
+        return new ModelMapper().map(position, PositionDto.class);
     }
 
     public User mapUserDtoToUserEntity(UserDto userDto) {
-        return modelMapper.map(userDto, User.class);
+        return new ModelMapper().map(userDto, User.class);
     }
 
     public UserDto mapUserEntityToUserDto(User user) {
-        return modelMapper.map(user, UserDto.class);
+        return new ModelMapper().map(user, UserDto.class);
     }
 
 }

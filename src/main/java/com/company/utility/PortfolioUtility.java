@@ -8,19 +8,26 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 @Component
 public class PortfolioUtility {
 
-    public PortfolioUtility() {
+    private final PositionUtility positionUtility;
+
+    public PortfolioUtility(final PositionUtility positionUtility) {
+        this.positionUtility = positionUtility;
     }
 
     public List<PortfolioDto> loadPortfolios() throws ParseException {
         List<PortfolioDto> portfolios = new LinkedList<>();
+        portfolios.add(getConservativePortfolioDetails());
+        portfolios.add(getAggressivePortfolioDetails());
+        return portfolios;
+    }
 
+    public PortfolioDto getConservativePortfolioDetails() throws ParseException {
         PortfolioDto conservative_portfolio = PortfolioDto.builder()
                 .id(21L)
                 .portfolioId("1001")
@@ -28,10 +35,13 @@ public class PortfolioUtility {
                 .currency(Currency.GBP)
                 .isActive(Boolean.TRUE)
                 .fundSize(new BigDecimal(70000))
-                .creationDate(getDateForPortfolio())
+                .creationDate(new SimpleDateFormat("yyyyMMdd").parse("20201230"))
                 .positions(getPositionsForConservativePortfolio())
                 .build();
+        return conservative_portfolio;
+    }
 
+    public PortfolioDto getAggressivePortfolioDetails() throws ParseException {
         PortfolioDto aggressive_portfolio = PortfolioDto.builder()
                 .id(20L)
                 .portfolioId("1002")
@@ -39,95 +49,24 @@ public class PortfolioUtility {
                 .currency(Currency.USD)
                 .isActive(Boolean.TRUE)
                 .fundSize(new BigDecimal(80000))
-                .creationDate(getDateForPortfolio())
+                .creationDate(new SimpleDateFormat("yyyyMMdd").parse("20201230"))
                 .positions(getPositionsForAggressivePortfolio())
                 .build();
-
-        portfolios.add(conservative_portfolio);
-        portfolios.add(aggressive_portfolio);
-
-        return portfolios;
-    }
-
-    public Date getDateForPortfolio() throws ParseException {
-        return new SimpleDateFormat("yyyyMMdd").parse("20201230");
+        return aggressive_portfolio;
     }
 
     public List<PositionDto> getPositionsForConservativePortfolio() throws ParseException {
         List<PositionDto> positions = new LinkedList<>();
-
-        PositionDto position_start_of_month = PositionDto.builder()
-                .id(1L)
-                .portfolioId("1001")
-                .portfolioName("Conservative Portfolio")
-                .currency(Currency.GBP)
-                .numberShares(100)
-                .positionMarketValue(10000)
-                .startDate(getStartDateStartOfMonth())
-                .endDate(getEndDateTimeStartOfMonth())
-                .build();
-
-        PositionDto position_end_of_month = PositionDto.builder()
-                .id(2L)
-                .portfolioId("1001")
-                .portfolioName("Conservative Portfolio")
-                .currency(Currency.GBP)
-                .numberShares(200)
-                .positionMarketValue(20000)
-                .startDate(getStartDateStartOfMonth())
-                .endDate(getEndDateTimeEndOfMonth())
-                .build();
-
-        positions.add(position_start_of_month);
-        positions.add(position_end_of_month);
-
+        positions.add(positionUtility.getPositionAtStartOfMonthForConservativePortfolio());
+        positions.add(positionUtility.getPositionAtEndOfMonthForConservativePortfolio());
         return positions;
-    }
-
-    public Date getStartDateStartOfMonth() throws ParseException {
-        return new SimpleDateFormat("yyyyMMdd").parse("20201230");
-    }
-
-    public Date getEndDateTimeStartOfMonth() throws ParseException {
-        return new SimpleDateFormat("yyyyMMdd").parse("20211230");
-    }
-
-    public Date getStartDateEndOfMonth() throws ParseException {
-        return new SimpleDateFormat("yyyyMMdd").parse("20201230");
-    }
-
-    public Date getEndDateTimeEndOfMonth() throws ParseException {
-        return new SimpleDateFormat("yyyyMMdd").parse("20201230");
     }
 
     public List<PositionDto> getPositionsForAggressivePortfolio() throws ParseException {
         List<PositionDto> positions = new LinkedList<>();
-
-        PositionDto position_start_of_month = PositionDto.builder()
-                .id(1L)
-                .portfolioId("1002")
-                .portfolioName("Aggressive Portfolio")
-                .currency(Currency.GBP)
-                .numberShares(100)
-                .positionMarketValue(10000)
-                .startDate(getStartDateStartOfMonth())
-                .endDate(getEndDateTimeStartOfMonth())
-                .build();
-
-        PositionDto position_end_of_month = PositionDto.builder()
-                .id(2L)
-                .portfolioId("1001")
-                .portfolioName("Conservative Portfolio")
-                .currency(Currency.GBP)
-                .numberShares(200)
-                .positionMarketValue(20000)
-                .startDate(getStartDateEndOfMonth())
-                .endDate(getEndDateTimeEndOfMonth())
-                .build();
-
-        positions.add(position_start_of_month);
-        positions.add(position_end_of_month);
-
+        positions.add(positionUtility.getPositionAtStartOfMonthForAggressivePortfolio());
+        positions.add(positionUtility.getPositionAtEndOfMonthForAggressivePortfolio());
         return positions;
     }
+
 }
