@@ -44,15 +44,12 @@ public class GFGMapFlattenning {
         /**
          * Creating a List class object holding all elements after flattening
          */
-        List<String> s = flatten(map.values()).collect(Collectors.toList());
-
-        System.out.println("==============");
+        List<String> flattenedList = flatten(map.values()).collect(Collectors.toList());
 
         /**
          *  Print and display the above List object
          */
-        System.out.println(s);
+        System.out.println(flattenedList);
 
-        System.out.println("==============");
     }
 }

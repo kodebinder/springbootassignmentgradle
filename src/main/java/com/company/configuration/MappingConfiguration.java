@@ -8,17 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MappingConfiguration {
 
-//    private final ModelMapper modelMapper;
-//
-//    public MappingConfiguration(final ModelMapper modelMapper) {
-//        this.modelMapper = modelMapper;
-//    }
-//
-//    @Bean
-//    public ModelMapper modelMapper() {
-//        return new ModelMapper();
-//    }
-
     public Address mapAddressDtoToAddressEntity(AddressDto addressDto) {
         return new ModelMapper().map(addressDto, Address.class);
     }
@@ -73,6 +62,34 @@ public class MappingConfiguration {
 
     public UserDto mapUserEntityToUserDto(User user) {
         return new ModelMapper().map(user, UserDto.class);
+    }
+
+    public AddressDto mapObjectToAddressDto(Object object) {
+        return new ModelMapper().map(object, AddressDto.class);
+    }
+
+    public BankAccountDto mapObjectToBankAccountDto(Object object) {
+        return new ModelMapper().map(object, BankAccountDto.class);
+    }
+
+    public BankOperationDto mapObjectToBankOperationDto(Object object) {
+        return new ModelMapper().map(object, BankOperationDto.class);
+    }
+
+    public CompanyDto mapObjectToCompanyDto(Object object) {
+        return new ModelMapper().map(object, CompanyDto.class);
+    }
+
+    public PortfolioDto mapObjectToPortfolioDto(Object object) {
+        return new ModelMapper().map(object, PortfolioDto.class);
+    }
+
+    public PositionDto mapObjectToPositionDto(Object object) {
+        return new ModelMapper().map(object, PositionDto.class);
+    }
+
+    public UserDto mapObjectToUserDto(Object object) {
+        return new ModelMapper().map(object, UserDto.class);
     }
 
 }

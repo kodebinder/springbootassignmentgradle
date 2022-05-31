@@ -26,7 +26,7 @@ public class DataController {
     }
 
     @GetMapping("/data")
-    public Map<String, List<Object>> getCache() throws ParseException {
+    public Map<String, List<Map<String, Object>>> getCache() throws ParseException {
         return dataService.getCache();
     }
 
@@ -36,7 +36,7 @@ public class DataController {
     }
 
     @GetMapping("/parse-json")
-    public Map<String, List<Object>> parseJson() {
+    public Map<String, List<Map<String, Object>>> parseJson() {
         return dataService.parseJson();
     }
 

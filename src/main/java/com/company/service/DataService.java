@@ -1,6 +1,7 @@
 package com.company.service;
 
 import com.company.configuration.MappingConfiguration;
+import com.company.dto.*;
 import com.company.entity.*;
 import com.company.repository.DbColumnRepository;
 import com.company.utility.*;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Stream;
@@ -56,17 +58,28 @@ public class DataService {
         this.modelMapper = modelMapper;
     }
 
-    public Map<String, List<Object>> getCache() throws ParseException {
-        Map<String, List<Object>> cache = new LinkedHashMap<>();
+    public Map<String, List<Map<String, Object>>> getCache() throws ParseException {
+        Map<String, List<Map<String, Object>>> cache = new LinkedHashMap<>();
 
-        List<Object> investments = new LinkedList<>();
+        List<Map<String, Object>> investments = new LinkedList<>();
 
-        investments.add(portfolioUtility.loadPortfolios());
-        investments.add(bankAccountUtility.loadBankAccounts());
+        Map<String, Object> portfolioCache = new LinkedHashMap<>();
+        portfolioCache.put("portfolio", Arrays.asList(portfolioUtility.loadPortfolios()));
+        investments.add(portfolioCache);
 
-        List<Object> crm = new LinkedList<>();
-        crm.add(userUtility.loadUsers());
-        crm.add(companyUtility.loadCompanies());
+        Map<String, Object> bankAccountCache = new LinkedHashMap<>();
+        bankAccountCache.put("bankAccount", Arrays.asList(bankAccountUtility.loadBankAccounts()));
+        investments.add(bankAccountCache);
+
+        List<Map<String, Object>> crm = new LinkedList<>();
+
+        Map<String, Object> userCache = new LinkedHashMap<>();
+        userCache.put("user", Arrays.asList(userUtility.loadUsers()));
+        crm.add(userCache);
+
+        Map<String, Object> companyCache = new LinkedHashMap<>();
+        companyCache.put("company", Arrays.asList(companyUtility.loadCompanies()));
+        crm.add(companyCache);
 
         cache.put("investments", investments);
         cache.put("crm", crm);
@@ -76,9 +89,14 @@ public class DataService {
 
     /**
      * To flatten a map containing a list of items as values
+     *
+     * @param values
+     * @param <T>
+     * @return
      */
-    public <T> Stream<T> flatten(Collection<List<T>> values) {
-        return values.stream().flatMap(Collection::stream);
+    public static <T> Stream<T> flatten(Collection<List<T>> values) {
+        Stream<T> stream = values.stream().flatMap(Collection::stream);
+        return stream;
     }
 
     /**
@@ -87,7 +105,7 @@ public class DataService {
      * @param cache
      * @return
      */
-    public Map<String, Object> getFlattenedJson(Map<String, List<Object>> cache) {
+    public Map<String, Object> getFlattenedJson(Map<String, List<Map<String, Object>>> cache) {
         Gson gson = new Gson();
         String jsonString = gson.toJson(cache);
         String flattenedJsonString = JsonFlattener.flatten(jsonString);
@@ -97,20 +115,15 @@ public class DataService {
         return flattenedJsonMap;
     }
 
-    public Map<String, List<Object>> parseJson() {
-        Map<String, List<Object>> cache = new LinkedHashMap<>();
+    public Map<String, List<Map<String, Object>>> parseJson() {
+        Map<String, List<Map<String, Object>>> cache = new LinkedHashMap<>();
         try {
             cache = getCache();
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-
         cache.forEach((k, v) -> System.out.println(k + " " + v));
         return cache;
-    }
-
-    public void performTransformation() {
-
     }
 
     public List<List<String>> getGroupedValues() {
@@ -130,83 +143,74 @@ public class DataService {
 
     public void createBaseDbColumnsFromDto() throws ParseException {
 
-        Map<String, List<Object>> cache = getCache();
-        cache.get("investments");
+        Map<String, List<Map<String, Object>>> cache = getCache();
 
-        List<Object> list = new LinkedList<>();
-        list.add(mappingConfiguration.mapAddressDtoToAddressEntity(addressUtility.getAddressDetailsForMark()));
-        list.add(mappingConfiguration.mapBankAccountDtoToBankAccountEntity(bankAccountUtility.getIciciBankAccountDetails()));
-        list.add(mappingConfiguration.mapBankOperationDtoToBankOperationEntity(bankOperationUtility.getIciciBankOperationDetails()));
-        list.add(mappingConfiguration.mapCompanyDtoToCompanyEntity(companyUtility.getRelianceDetails()));
-        list.add(mappingConfiguration.mapPortfolioDtoToPortfolioEntity(portfolioUtility.getConservativePortfolioDetails()));
-        list.add(mappingConfiguration.mapPositionDtoToPositionEntity(positionUtility.getPositionAtStartOfMonthForAggressivePortfolio()));
-        list.add(mappingConfiguration.mapUserDtoToUserEntity(userUtility.getUserDetailsForJohn()));
-
-        for (int i = 0; i < list.size(); i++) {
-            if (i == 0) {
-                Address address = (Address) list.get(i);
-                BaseDbColumn baseDbColumn = BaseDbColumn.builder()
-                        .name("address")
-                        .label("address")
-                        .type("String")
-                        .groupedValues(getGroupedValues())
-                        .build();
-                dbColumnRepository.save(baseDbColumn);
-            } else if (i == 1) {
-                BankAccount bankAccount = (BankAccount) list.get(i);
-                BaseDbColumn baseDbColumn = BaseDbColumn.builder()
-                        .name("bankAccount")
-                        .label("bankAccount")
-                        .type("String")
-                        .groupedValues(getGroupedValues())
-                        .build();
-                dbColumnRepository.save(baseDbColumn);
-            } else if (i == 2) {
-                BankOperation bankOperation = (BankOperation) list.get(i);
-                BaseDbColumn baseDbColumn = BaseDbColumn.builder()
-                        .name("bankOperation")
-                        .label("bankOperation")
-                        .type("String")
-                        .groupedValues(getGroupedValues())
-                        .build();
-                dbColumnRepository.save(baseDbColumn);
-            } else if (i == 3) {
-                Company company = (Company) list.get(i);
-                BaseDbColumn baseDbColumn = BaseDbColumn.builder()
-                        .name("company")
-                        .label("company")
-                        .type("String")
-                        .groupedValues(getGroupedValues())
-                        .build();
-                dbColumnRepository.save(baseDbColumn);
-            } else if (i == 4) {
-                Portfolio portfolio = (Portfolio) list.get(i);
-                BaseDbColumn baseDbColumn = BaseDbColumn.builder()
-                        .name("portfolio")
-                        .label("portfolio")
-                        .type("String")
-                        .groupedValues(getGroupedValues())
-                        .build();
-                dbColumnRepository.save(baseDbColumn);
-            } else if (i == 5) {
-                Position position = (Position) list.get(i);
-                BaseDbColumn baseDbColumn = BaseDbColumn.builder()
-                        .name("position")
-                        .label("position")
-                        .type("String")
-                        .groupedValues(getGroupedValues())
-                        .build();
-                dbColumnRepository.save(baseDbColumn);
-            } else if (i == 6) {
-                User user = (User) list.get(i);
-                BaseDbColumn baseDbColumn = BaseDbColumn.builder()
-                        .name("user")
-                        .label("user")
-                        .type("String")
-                        .groupedValues(getGroupedValues())
-                        .build();
-                dbColumnRepository.save(baseDbColumn);
+        for (int i = 0; i < cache.size(); i++) {
+            for (Map.Entry<String, List<Map<String, Object>>> e : cache.entrySet()) {
+                for (Map<String, Object> map : e.getValue()) {
+                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+                        String key = entry.getKey();
+                        Object value = entry.getValue();
+                        if ("address".equals(key)) {
+                            AddressDto addressDto = mappingConfiguration.mapObjectToAddressDto(value);
+                            Address address = mappingConfiguration.mapAddressDtoToAddressEntity(addressDto);
+                            Class<?> clazz = address.getClass();
+                            parseFields(clazz);
+                        } else if ("bankAccount".equals(key)) {
+                            BankAccountDto bankAccountDto = mappingConfiguration.mapObjectToBankAccountDto(value);
+                            BankAccount bankAccount = mappingConfiguration.mapBankAccountDtoToBankAccountEntity(bankAccountDto);
+                            Class<?> clazz = bankAccount.getClass();
+                            parseFields(clazz);
+                        } else if ("bankOperation".equals(key)) {
+                            BankOperationDto bankOperationDto = mappingConfiguration.mapObjectToBankOperationDto(value);
+                            BankOperation bankOperation = mappingConfiguration.mapBankOperationDtoToBankOperationEntity(bankOperationDto);
+                            Class<?> clazz = bankOperation.getClass();
+                            parseFields(clazz);
+                        } else if ("company".equals(key)) {
+                            CompanyDto companyDto = mappingConfiguration.mapObjectToCompanyDto(value);
+                            Company company = mappingConfiguration.mapCompanyDtoToCompanyEntity(companyDto);
+                            Class<?> clazz = company.getClass();
+                            parseFields(clazz);
+                        } else if ("portfolio".equals(key)) {
+                            PortfolioDto portfolioDto = mappingConfiguration.mapObjectToPortfolioDto(value);
+                            Portfolio portfolio = mappingConfiguration.mapPortfolioDtoToPortfolioEntity(portfolioDto);
+                            Class<?> clazz = portfolio.getClass();
+                            parseFields(clazz);
+                        } else if ("position".equals(key)) {
+                            PositionDto positionDto = mappingConfiguration.mapObjectToPositionDto(value);
+                            Position position = mappingConfiguration.mapPositionDtoToPositionEntity(positionDto);
+                            Class<?> clazz = position.getClass();
+                            parseFields(clazz);
+                        } else if ("user".equals(key)) {
+                            UserDto userDto = mappingConfiguration.mapObjectToUserDto(value);
+                            User user = mappingConfiguration.mapUserDtoToUserEntity(userDto);
+                            Class<?> clazz = user.getClass();
+                            parseFields(clazz);
+                        }
+                    }
+                }
             }
+        }
+    }
+
+    private void parseFields(Class<?> clazz) {
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            BaseDbColumn baseDbColumn = BaseDbColumn.builder()
+                    .name(field.getName())
+                    .label(field.getName())
+                    .type(String.valueOf(field.getAnnotatedType()))
+                    .groupedValues(getGroupedValues())
+                    .build();
+
+            BaseDbColumn existing = dbColumnRepository.findByName(field.getName());
+            if (Objects.nonNull(existing)) {
+                baseDbColumn.setId(existing.getId());
+            }
+
+            dbColumnRepository.save(baseDbColumn);
+
+
         }
     }
 }
