@@ -1,4 +1,4 @@
-package com.company.data;
+package com.company.service;
 
 import com.company.entity.DbColumn;
 import com.company.repository.DbColumnRepository;
