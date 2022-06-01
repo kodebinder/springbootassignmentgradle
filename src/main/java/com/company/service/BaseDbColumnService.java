@@ -3,7 +3,7 @@ package com.company.service;
 import com.company.configuration.MappingConfiguration;
 import com.company.dto.*;
 import com.company.entity.*;
-import com.company.repository.DbColumnRepository;
+import com.company.repository.BaseDbColumnRepository;
 import com.company.utility.*;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.google.gson.Gson;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 @Service
 @Slf4j
-public class DataService {
+public class BaseDbColumnService {
 
     private final AddressUtility addressUtility;
     private final BankAccountUtility bankAccountUtility;
@@ -29,12 +29,12 @@ public class DataService {
 
     private final UserUtility userUtility;
 
-    private final DbColumnRepository dbColumnRepository;
+    private final BaseDbColumnRepository baseDbColumnRepository;
     private final MappingConfiguration mappingConfiguration;
 
     private final ModelMapper modelMapper;
 
-    public DataService(
+    public BaseDbColumnService(
             final AddressUtility addressUtility,
             final BankAccountUtility bankAccountUtility,
             final BankOperationUtility bankOperationUtility,
@@ -42,7 +42,7 @@ public class DataService {
             final PortfolioUtility portfolioUtility,
             final PositionUtility positionUtility,
             final UserUtility userUtility,
-            final DbColumnRepository dbColumnRepository,
+            final BaseDbColumnRepository baseDbColumnRepository,
             final MappingConfiguration mappingConfiguration,
             final ModelMapper modelMapper
     ) {
@@ -53,7 +53,7 @@ public class DataService {
         this.portfolioUtility = portfolioUtility;
         this.positionUtility = positionUtility;
         this.userUtility = userUtility;
-        this.dbColumnRepository = dbColumnRepository;
+        this.baseDbColumnRepository = baseDbColumnRepository;
         this.mappingConfiguration = mappingConfiguration;
         this.modelMapper = modelMapper;
     }
@@ -203,14 +203,12 @@ public class DataService {
                     .groupedValues(getGroupedValues())
                     .build();
 
-            BaseDbColumn existing = dbColumnRepository.findByName(field.getName());
+            BaseDbColumn existing = baseDbColumnRepository.findByName(field.getName());
             if (Objects.nonNull(existing)) {
                 baseDbColumn.setId(existing.getId());
             }
 
-            dbColumnRepository.save(baseDbColumn);
-
-
+            baseDbColumnRepository.save(baseDbColumn);
         }
     }
 }
