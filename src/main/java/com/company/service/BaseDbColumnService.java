@@ -1,6 +1,7 @@
 package com.company.service;
 
 import com.company.configuration.MappingConfiguration;
+import com.company.constant.Constants;
 import com.company.dto.*;
 import com.company.entity.*;
 import com.company.repository.BaseDbColumnRepository;
@@ -129,52 +130,48 @@ public class BaseDbColumnService {
     }
 
     public List<String> getGroupedValues() {
-        return Arrays.asList("A","B","C");
+        return Arrays.asList("A", "B", "C");
     }
 
     public void createBaseDbColumnsFromDto() throws ParseException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         List<Object> cacheValues = getCacheValues(getCache());
         for (int i = 0; i < cacheValues.size(); i++) {
             Object object = cacheValues.get(i);
-            List<Object> allExistingDtoObjects = getAllDtoObjects();
-            System.out.println("-----------");
-            System.out.println("All Existing");
-            allExistingDtoObjects.forEach(System.out::println);
-            System.out.println("-----------");
+            List<Object> existingDtoInsidePackage = getAllExistingDtoInsidePackage();
             List<Object> objects = (List<Object>) object;
             System.out.println(objects.size());
             for (Object obj : objects) {
-                if (obj.toString().contains("[AddressDto(")) {
+                if (obj.toString().contains(Constants.ADDRESSDTO)) {
                     AddressDto addressDto = mappingConfiguration.mapObjectToAddressDto(obj);
                     Address address = mappingConfiguration.mapAddressDtoToAddressEntity(addressDto);
                     Class<?> clazz = address.getClass();
                     parseFields(clazz);
-                } else if (obj.toString().contains("[BankAccountDto(")) {
+                } else if (obj.toString().contains(Constants.BANKACCOUNTDTO)) {
                     BankAccountDto bankAccountDto = mappingConfiguration.mapObjectToBankAccountDto(obj);
                     BankAccount bankAccount = mappingConfiguration.mapBankAccountDtoToBankAccountEntity(bankAccountDto);
                     Class<?> clazz = bankAccount.getClass();
                     parseFields(clazz);
-                } else if (obj.toString().contains("[BankOperation(")) {
+                } else if (obj.toString().contains(Constants.BANKOPERATIONDTO)) {
                     BankOperationDto bankOperationDto = mappingConfiguration.mapObjectToBankOperationDto(obj);
                     BankOperation bankOperation = mappingConfiguration.mapBankOperationDtoToBankOperationEntity(bankOperationDto);
                     Class<?> clazz = bankOperation.getClass();
                     parseFields(clazz);
-                } else if (obj.toString().contains("[CompanyDto(")) {
+                } else if (obj.toString().contains(Constants.COMPANYDTO)) {
                     CompanyDto companyDto = mappingConfiguration.mapObjectToCompanyDto(obj);
                     Company company = mappingConfiguration.mapCompanyDtoToCompanyEntity(companyDto);
                     Class<?> clazz = company.getClass();
                     parseFields(clazz);
-                } else if (obj.toString().contains("[PortfolioDto(")) {
+                } else if (obj.toString().contains(Constants.PORTFOLIODTO)) {
                     PortfolioDto portfolioDto = mappingConfiguration.mapObjectToPortfolioDto(obj);
                     Portfolio portfolio = mappingConfiguration.mapPortfolioDtoToPortfolioEntity(portfolioDto);
                     Class<?> clazz = portfolio.getClass();
                     parseFields(clazz);
-                } else if (obj.toString().contains("[PositionDto(")) {
+                } else if (obj.toString().contains(Constants.POSITIONDTO)) {
                     PositionDto positionDto = mappingConfiguration.mapObjectToPositionDto(obj);
                     Position position = mappingConfiguration.mapPositionDtoToPositionEntity(positionDto);
                     Class<?> clazz = position.getClass();
                     parseFields(clazz);
-                } else if (obj.toString().contains("[UserDto(")) {
+                } else if (obj.toString().contains(Constants.USERDTO)) {
                     UserDto userDto = mappingConfiguration.mapObjectToUserDto(obj);
                     User user = mappingConfiguration.mapUserDtoToUserEntity(userDto);
                     Class<?> clazz = user.getClass();
@@ -184,8 +181,19 @@ public class BaseDbColumnService {
         }
     }
 
-    // https://dzone.com/articles/get-all-classes-within-package
-    public List<Object> getAllDtoObjects() throws IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException {
+    /**
+     * https://dzone.com/articles/get-all-classes-within-package
+     *
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws ParseException
+     */
+    public List<Object> getAllExistingDtoInsidePackage() throws IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException {
         Class[] classes = getClasses("com.company.dto");
         List<Object> objects = new LinkedList<>();
         for (Class clazz : classes) {
@@ -316,14 +324,6 @@ public class BaseDbColumnService {
 
             baseDbColumnRepository.save(baseDbColumn);
         }
-    }
-
-    public static List<BaseDbColumn> getBaseDbColumns() {
-        return baseDbColumns;
-    }
-
-    public static void setBaseDbColumns(List<BaseDbColumn> baseDbColumns) {
-        BaseDbColumnService.baseDbColumns = baseDbColumns;
     }
 
     public List<BaseDbColumn> getListBaseDbColumns() throws ParseException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
