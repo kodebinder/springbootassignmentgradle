@@ -47,6 +47,11 @@ public class BaseDbColumnController {
         baseDbColumnService.createBaseDbColumnsFromDto();
     }
 
+    @GetMapping("/getbasedbcolumns")
+    public void getBaseDbColumns() throws ParseException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        baseDbColumnService.getListBaseDbColumns();
+    }
+
     @GetMapping("/findalldto")
     public void findAllDto() throws ParseException, IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         baseDbColumnService.getAllDtoObjects();

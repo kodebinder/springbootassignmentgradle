@@ -30,6 +30,8 @@ import java.util.stream.Stream;
 @Slf4j
 public class BaseDbColumnService {
 
+    private static List<BaseDbColumn> baseDbColumns = new LinkedList<>();
+
     private final AddressUtility addressUtility;
     private final BankAccountUtility bankAccountUtility;
     private final BankOperationUtility bankOperationUtility;
@@ -127,7 +129,7 @@ public class BaseDbColumnService {
     }
 
     public List<String> getGroupedValues() {
-        return null;
+        return Arrays.asList("A","B","C");
     }
 
     public void createBaseDbColumnsFromDto() throws ParseException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -137,6 +139,7 @@ public class BaseDbColumnService {
             List<Object> allExistingDtoObjects = getAllDtoObjects();
             System.out.println("-----------");
             System.out.println("All Existing");
+            allExistingDtoObjects.forEach(System.out::println);
             System.out.println("-----------");
             List<Object> objects = (List<Object>) object;
             System.out.println(objects.size());
@@ -309,8 +312,24 @@ public class BaseDbColumnService {
                 baseDbColumn.setId(existing.getId());
             }
 
+            baseDbColumns.add(baseDbColumn);
+
             baseDbColumnRepository.save(baseDbColumn);
         }
+    }
+
+    public static List<BaseDbColumn> getBaseDbColumns() {
+        return baseDbColumns;
+    }
+
+    public static void setBaseDbColumns(List<BaseDbColumn> baseDbColumns) {
+        BaseDbColumnService.baseDbColumns = baseDbColumns;
+    }
+
+    public List<BaseDbColumn> getListBaseDbColumns() throws ParseException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        createBaseDbColumnsFromDto();
+        baseDbColumns.forEach(System.out::println);
+        return baseDbColumns;
     }
 }
 
