@@ -30,17 +30,17 @@ public class BaseDbColumnController {
         return baseDbColumnService.getCache();
     }
 
-    @GetMapping("/flatten-data")
+    @GetMapping("/flattendata")
     public Map<String, Object> displayFlattenData() throws ParseException {
         return baseDbColumnService.getFlattenedJson(baseDbColumnService.getCache());
     }
 
-    @GetMapping("/parse-json")
+    @GetMapping("/parsejsonandsavetodb")
     public Map<String, List<Map<String, Object>>> parseJson() {
         return baseDbColumnService.parseJson();
     }
 
-    @GetMapping("/createBaseDbColumns")
+    @GetMapping("/createbasedbcolumns")
     public void createBaseDbColumns() throws ParseException {
         baseDbColumnService.createBaseDbColumnsFromDto();
     }
