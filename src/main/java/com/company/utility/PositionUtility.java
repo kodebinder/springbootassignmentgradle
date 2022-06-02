@@ -1,6 +1,6 @@
 package com.company.utility;
 
-import com.company.dto.Currency;
+import com.company.constant.Currency;
 import com.company.dto.PositionDto;
 import org.springframework.stereotype.Component;
 

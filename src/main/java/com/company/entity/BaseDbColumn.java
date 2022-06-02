@@ -22,5 +22,5 @@ public class BaseDbColumn {
     private String label;
     private String type;
     @Transient
-    private List<List<String>> groupedValues;
+    private List<String> groupedValues;
 }

@@ -1,5 +1,6 @@
 package com.company.dto;
 
+import com.company.constant.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

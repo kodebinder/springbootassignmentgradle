@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +28,7 @@ public class BaseDbColumnController {
     }
 
     @GetMapping("/data")
-    public Map<String, List<Map<String, Object>>> getCache() throws ParseException {
+    public Map<String, List<Object>> getCache() throws ParseException {
         return baseDbColumnService.getCache();
     }
 
@@ -36,12 +38,17 @@ public class BaseDbColumnController {
     }
 
     @GetMapping("/parsejsonandsavetodb")
-    public Map<String, List<Map<String, Object>>> parseJson() {
+    public Map<String, List<Object>> parseJson() {
         return baseDbColumnService.parseJson();
     }
 
     @GetMapping("/createbasedbcolumns")
-    public void createBaseDbColumns() throws ParseException {
+    public void createBaseDbColumns() throws ParseException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         baseDbColumnService.createBaseDbColumnsFromDto();
+    }
+
+    @GetMapping("/findalldto")
+    public void findAllDto() throws ParseException, IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        baseDbColumnService.getAllDtoObjects();
     }
 }

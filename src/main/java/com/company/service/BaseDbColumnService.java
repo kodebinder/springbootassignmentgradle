@@ -8,12 +8,22 @@ import com.company.utility.*;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -58,28 +68,18 @@ public class BaseDbColumnService {
         this.modelMapper = modelMapper;
     }
 
-    public Map<String, List<Map<String, Object>>> getCache() throws ParseException {
-        Map<String, List<Map<String, Object>>> cache = new LinkedHashMap<>();
+    public Map<String, List<Object>> getCache() throws ParseException {
+        Map<String, List<Object>> cache = new LinkedHashMap<>();
 
-        List<Map<String, Object>> investments = new LinkedList<>();
+        List<Object> investments = new LinkedList<>();
 
-        Map<String, Object> portfolioCache = new LinkedHashMap<>();
-        portfolioCache.put("portfolio", Arrays.asList(portfolioUtility.loadPortfolios()));
-        investments.add(portfolioCache);
+        investments.add(Arrays.asList(portfolioUtility.loadPortfolios()));
+        investments.add(Arrays.asList(bankAccountUtility.loadBankAccounts()));
 
-        Map<String, Object> bankAccountCache = new LinkedHashMap<>();
-        bankAccountCache.put("bankAccount", Arrays.asList(bankAccountUtility.loadBankAccounts()));
-        investments.add(bankAccountCache);
+        List<Object> crm = new LinkedList<>();
 
-        List<Map<String, Object>> crm = new LinkedList<>();
-
-        Map<String, Object> userCache = new LinkedHashMap<>();
-        userCache.put("user", Arrays.asList(userUtility.loadUsers()));
-        crm.add(userCache);
-
-        Map<String, Object> companyCache = new LinkedHashMap<>();
-        companyCache.put("company", Arrays.asList(companyUtility.loadCompanies()));
-        crm.add(companyCache);
+        crm.add(Arrays.asList(userUtility.loadUsers()));
+        crm.add(Arrays.asList(companyUtility.loadCompanies()));
 
         cache.put("investments", investments);
         cache.put("crm", crm);
@@ -105,7 +105,7 @@ public class BaseDbColumnService {
      * @param cache
      * @return
      */
-    public Map<String, Object> getFlattenedJson(Map<String, List<Map<String, Object>>> cache) {
+    public Map<String, Object> getFlattenedJson(Map<String, List<Object>> cache) {
         Gson gson = new Gson();
         String jsonString = gson.toJson(cache);
         String flattenedJsonString = JsonFlattener.flatten(jsonString);
@@ -115,8 +115,8 @@ public class BaseDbColumnService {
         return flattenedJsonMap;
     }
 
-    public Map<String, List<Map<String, Object>>> parseJson() {
-        Map<String, List<Map<String, Object>>> cache = new LinkedHashMap<>();
+    public Map<String, List<Object>> parseJson() {
+        Map<String, List<Object>> cache = new LinkedHashMap<>();
         try {
             cache = getCache();
         } catch (ParseException e) {
@@ -126,71 +126,172 @@ public class BaseDbColumnService {
         return cache;
     }
 
-    public List<List<String>> getGroupedValues() {
-        List<List<String>> groupedValues = new LinkedList<>();
-
-        List<String> record1 = new LinkedList<>();
-        record1.add("A");
-        record1.add("B");
-        List<String> record2 = new LinkedList<>();
-        record2.add("C");
-        record2.add("D");
-        groupedValues.add(record1);
-        groupedValues.add(record2);
-
-        return groupedValues;
+    public List<String> getGroupedValues() {
+        return null;
     }
 
-    public void createBaseDbColumnsFromDto() throws ParseException {
-
-        Map<String, List<Map<String, Object>>> cache = getCache();
-
-        for (int i = 0; i < cache.size(); i++) {
-            for (Map.Entry<String, List<Map<String, Object>>> e : cache.entrySet()) {
-                for (Map<String, Object> map : e.getValue()) {
-                    for (Map.Entry<String, Object> entry : map.entrySet()) {
-                        String key = entry.getKey();
-                        Object value = entry.getValue();
-                        if ("address".equals(key)) {
-                            AddressDto addressDto = mappingConfiguration.mapObjectToAddressDto(value);
-                            Address address = mappingConfiguration.mapAddressDtoToAddressEntity(addressDto);
-                            Class<?> clazz = address.getClass();
-                            parseFields(clazz);
-                        } else if ("bankAccount".equals(key)) {
-                            BankAccountDto bankAccountDto = mappingConfiguration.mapObjectToBankAccountDto(value);
-                            BankAccount bankAccount = mappingConfiguration.mapBankAccountDtoToBankAccountEntity(bankAccountDto);
-                            Class<?> clazz = bankAccount.getClass();
-                            parseFields(clazz);
-                        } else if ("bankOperation".equals(key)) {
-                            BankOperationDto bankOperationDto = mappingConfiguration.mapObjectToBankOperationDto(value);
-                            BankOperation bankOperation = mappingConfiguration.mapBankOperationDtoToBankOperationEntity(bankOperationDto);
-                            Class<?> clazz = bankOperation.getClass();
-                            parseFields(clazz);
-                        } else if ("company".equals(key)) {
-                            CompanyDto companyDto = mappingConfiguration.mapObjectToCompanyDto(value);
-                            Company company = mappingConfiguration.mapCompanyDtoToCompanyEntity(companyDto);
-                            Class<?> clazz = company.getClass();
-                            parseFields(clazz);
-                        } else if ("portfolio".equals(key)) {
-                            PortfolioDto portfolioDto = mappingConfiguration.mapObjectToPortfolioDto(value);
-                            Portfolio portfolio = mappingConfiguration.mapPortfolioDtoToPortfolioEntity(portfolioDto);
-                            Class<?> clazz = portfolio.getClass();
-                            parseFields(clazz);
-                        } else if ("position".equals(key)) {
-                            PositionDto positionDto = mappingConfiguration.mapObjectToPositionDto(value);
-                            Position position = mappingConfiguration.mapPositionDtoToPositionEntity(positionDto);
-                            Class<?> clazz = position.getClass();
-                            parseFields(clazz);
-                        } else if ("user".equals(key)) {
-                            UserDto userDto = mappingConfiguration.mapObjectToUserDto(value);
-                            User user = mappingConfiguration.mapUserDtoToUserEntity(userDto);
-                            Class<?> clazz = user.getClass();
-                            parseFields(clazz);
-                        }
-                    }
+    public void createBaseDbColumnsFromDto() throws ParseException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        List<Object> cacheValues = getCacheValues(getCache());
+        for (int i = 0; i < cacheValues.size(); i++) {
+            Object object = cacheValues.get(i);
+            List<Object> allExistingDtoObjects = getAllDtoObjects();
+            System.out.println("-----------");
+            System.out.println("All Existing");
+            System.out.println("-----------");
+            List<Object> objects = (List<Object>) object;
+            System.out.println(objects.size());
+            for (Object obj : objects) {
+                if (obj.toString().contains("[AddressDto(")) {
+                    AddressDto addressDto = mappingConfiguration.mapObjectToAddressDto(obj);
+                    Address address = mappingConfiguration.mapAddressDtoToAddressEntity(addressDto);
+                    Class<?> clazz = address.getClass();
+                    parseFields(clazz);
+                } else if (obj.toString().contains("[BankAccountDto(")) {
+                    BankAccountDto bankAccountDto = mappingConfiguration.mapObjectToBankAccountDto(obj);
+                    BankAccount bankAccount = mappingConfiguration.mapBankAccountDtoToBankAccountEntity(bankAccountDto);
+                    Class<?> clazz = bankAccount.getClass();
+                    parseFields(clazz);
+                } else if (obj.toString().contains("[BankOperation(")) {
+                    BankOperationDto bankOperationDto = mappingConfiguration.mapObjectToBankOperationDto(obj);
+                    BankOperation bankOperation = mappingConfiguration.mapBankOperationDtoToBankOperationEntity(bankOperationDto);
+                    Class<?> clazz = bankOperation.getClass();
+                    parseFields(clazz);
+                } else if (obj.toString().contains("[CompanyDto(")) {
+                    CompanyDto companyDto = mappingConfiguration.mapObjectToCompanyDto(obj);
+                    Company company = mappingConfiguration.mapCompanyDtoToCompanyEntity(companyDto);
+                    Class<?> clazz = company.getClass();
+                    parseFields(clazz);
+                } else if (obj.toString().contains("[PortfolioDto(")) {
+                    PortfolioDto portfolioDto = mappingConfiguration.mapObjectToPortfolioDto(obj);
+                    Portfolio portfolio = mappingConfiguration.mapPortfolioDtoToPortfolioEntity(portfolioDto);
+                    Class<?> clazz = portfolio.getClass();
+                    parseFields(clazz);
+                } else if (obj.toString().contains("[PositionDto(")) {
+                    PositionDto positionDto = mappingConfiguration.mapObjectToPositionDto(obj);
+                    Position position = mappingConfiguration.mapPositionDtoToPositionEntity(positionDto);
+                    Class<?> clazz = position.getClass();
+                    parseFields(clazz);
+                } else if (obj.toString().contains("[UserDto(")) {
+                    UserDto userDto = mappingConfiguration.mapObjectToUserDto(obj);
+                    User user = mappingConfiguration.mapUserDtoToUserEntity(userDto);
+                    Class<?> clazz = user.getClass();
+                    parseFields(clazz);
                 }
             }
         }
+    }
+
+    // https://dzone.com/articles/get-all-classes-within-package
+    public List<Object> getAllDtoObjects() throws IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException {
+        Class[] classes = getClasses("com.company.dto");
+        List<Object> objects = new LinkedList<>();
+        for (Class clazz : classes) {
+            Constructor<?> cons = clazz.getDeclaredConstructor();
+            cons.setAccessible(true);
+            Object object = cons.newInstance();
+            objects.add(object);
+        }
+        objects.forEach(System.out::println);
+        return objects;
+    }
+
+    /**
+     * Scans all classes accessible from the context class loader which belong to the given package and subpackages.
+     *
+     * @param packageName The base package
+     * @return The classes
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
+    private static Class[] getClasses(String packageName)
+            throws ClassNotFoundException, IOException {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        assert classLoader != null;
+        String path = packageName.replace('.', '/');
+        Enumeration resources = classLoader.getResources(path);
+        List<File> dirs = new ArrayList();
+        while (resources.hasMoreElements()) {
+            URL resource = (URL) resources.nextElement();
+            dirs.add(new File(resource.getFile()));
+        }
+        ArrayList classes = new ArrayList();
+        for (File directory : dirs) {
+            classes.addAll(findClasses(directory, packageName));
+        }
+        return (Class[]) classes.toArray(new Class[classes.size()]);
+    }
+
+    /**
+     * Recursive method used to find all classes in a given directory and subdirs.
+     *
+     * @param directory   The base directory
+     * @param packageName The package name for classes found inside the base directory
+     * @return The classes
+     * @throws ClassNotFoundException
+     */
+    private static List findClasses(File directory, String packageName) throws ClassNotFoundException {
+        List classes = new ArrayList();
+        if (!directory.exists()) {
+            return classes;
+        }
+        File[] files = directory.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                assert !file.getName().contains(".");
+                classes.addAll(findClasses(file, packageName + "." + file.getName()));
+            } else if (file.getName().endsWith("Dto.class")) {
+                classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+            }
+        }
+        return classes;
+    }
+
+    public static List<?> convertObjectToList(Object obj) {
+        List<?> list = new ArrayList<>();
+        if (obj.getClass().isArray()) {
+            list = Arrays.asList((Object[]) obj);
+        } else if (obj instanceof Collection) {
+            list = new ArrayList<>((Collection<?>) obj);
+        }
+        return list;
+    }
+
+    public Set<String> getCacheKeys(Map<String, List<Object>> cache) {
+        Set<String> keySet = cache.keySet();
+        return keySet;
+    }
+
+    public List<Object> getCacheValues(Map<String, List<Object>> cache) {
+        Collection<List<Object>> values = cache.values();
+        return flatten(values).collect(Collectors.toList());
+    }
+
+    public static JSONObject objectToJSONObject(Object object) {
+        Object json = null;
+        JSONObject jsonObject = null;
+        try {
+            json = new JSONTokener(object.toString()).nextValue();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (json instanceof JSONObject) {
+            jsonObject = (JSONObject) json;
+        }
+        return jsonObject;
+    }
+
+    public static JSONArray objectToJSONArray(Object object) {
+        Object json = null;
+        JSONArray jsonArray = null;
+        try {
+            json = new JSONTokener(object.toString()).nextValue();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (json instanceof JSONArray) {
+            jsonArray = (JSONArray) json;
+        }
+        return jsonArray;
     }
 
     private void parseFields(Class<?> clazz) {
@@ -212,3 +313,4 @@ public class BaseDbColumnService {
         }
     }
 }
+
