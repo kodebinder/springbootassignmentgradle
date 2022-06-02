@@ -130,7 +130,15 @@ public class BaseDbColumnService {
         for (int i = 0; i < cacheValues.size(); i++) {
             Object object = cacheValues.get(i);
             List<Object> existingDtoInsidePackage = getAllExistingDtoInsidePackage();
+            System.out.println("--------- existingDtoInsidePackage --------- ");
+            System.out.println(existingDtoInsidePackage.size());
+            existingDtoInsidePackage.forEach(System.out::println);
+            System.out.println("--------- existingDtoInsidePackage --------- ");
             List<Object> objects = (List<Object>) object;
+            System.out.println("--------- objects --------- ");
+            System.out.println(objects.size());
+            objects.forEach(System.out::println);
+            System.out.println("--------- objects --------- ");
             for (Object obj : objects) {
                 if (obj.toString().contains(Constants.ADDRESSDTO)) {
                     AddressDto addressDto = mappingConfiguration.mapObjectToAddressDto(obj);
