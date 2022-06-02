@@ -8,11 +8,8 @@ import com.company.repository.BaseDbColumnRepository;
 import com.company.utility.*;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.google.gson.Gson;
-import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +25,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-@Slf4j
 public class BaseDbColumnService {
+
+    private static final Logger LOGGER = LogManager.getLogger(BaseDbColumnService.class);
 
     private static List<BaseDbColumn> baseDbColumns = new LinkedList<>();
 
@@ -73,20 +71,14 @@ public class BaseDbColumnService {
 
     public Map<String, List<Object>> getCache() throws ParseException {
         Map<String, List<Object>> cache = new LinkedHashMap<>();
-
         List<Object> investments = new LinkedList<>();
-
+        List<Object> crm = new LinkedList<>();
         investments.add(Arrays.asList(portfolioUtility.loadPortfolios()));
         investments.add(Arrays.asList(bankAccountUtility.loadBankAccounts()));
-
-        List<Object> crm = new LinkedList<>();
-
         crm.add(Arrays.asList(userUtility.loadUsers()));
         crm.add(Arrays.asList(companyUtility.loadCompanies()));
-
         cache.put("investments", investments);
         cache.put("crm", crm);
-
         return cache;
     }
 
@@ -139,7 +131,6 @@ public class BaseDbColumnService {
             Object object = cacheValues.get(i);
             List<Object> existingDtoInsidePackage = getAllExistingDtoInsidePackage();
             List<Object> objects = (List<Object>) object;
-            System.out.println(objects.size());
             for (Object obj : objects) {
                 if (obj.toString().contains(Constants.ADDRESSDTO)) {
                     AddressDto addressDto = mappingConfiguration.mapObjectToAddressDto(obj);
@@ -202,7 +193,7 @@ public class BaseDbColumnService {
             Object object = cons.newInstance();
             objects.add(object);
         }
-        objects.forEach(System.out::println);
+        LOGGER.info("Objects : {}", objects);
         return objects;
     }
 
@@ -275,34 +266,6 @@ public class BaseDbColumnService {
     public List<Object> getCacheValues(Map<String, List<Object>> cache) {
         Collection<List<Object>> values = cache.values();
         return flatten(values).collect(Collectors.toList());
-    }
-
-    public static JSONObject objectToJSONObject(Object object) {
-        Object json = null;
-        JSONObject jsonObject = null;
-        try {
-            json = new JSONTokener(object.toString()).nextValue();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (json instanceof JSONObject) {
-            jsonObject = (JSONObject) json;
-        }
-        return jsonObject;
-    }
-
-    public static JSONArray objectToJSONArray(Object object) {
-        Object json = null;
-        JSONArray jsonArray = null;
-        try {
-            json = new JSONTokener(object.toString()).nextValue();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (json instanceof JSONArray) {
-            jsonArray = (JSONArray) json;
-        }
-        return jsonArray;
     }
 
     private void parseFields(Class<?> clazz) {

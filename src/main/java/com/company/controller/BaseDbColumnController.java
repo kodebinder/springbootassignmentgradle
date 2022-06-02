@@ -1,5 +1,6 @@
 package com.company.controller;
 
+import com.company.entity.BaseDbColumn;
 import com.company.service.BaseDbColumnService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,12 +49,12 @@ public class BaseDbColumnController {
     }
 
     @GetMapping("/getbasedbcolumns")
-    public void getBaseDbColumns() throws ParseException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        baseDbColumnService.getListBaseDbColumns();
+    public List<BaseDbColumn> getBaseDbColumns() throws ParseException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        return baseDbColumnService.getListBaseDbColumns();
     }
 
     @GetMapping("/findalldto")
-    public void findAllDto() throws ParseException, IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        baseDbColumnService.getAllDtoObjects();
+    public List<Object> findAllDto() throws ParseException, IOException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        return baseDbColumnService.getAllExistingDtoInsidePackage();
     }
 }
