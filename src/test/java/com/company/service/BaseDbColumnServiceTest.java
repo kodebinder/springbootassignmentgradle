@@ -1,16 +1,5 @@
 package com.company.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.company.configuration.MappingConfiguration;
 import com.company.dto.BankAccountDto;
 import com.company.dto.CompanyDto;
@@ -18,20 +7,7 @@ import com.company.dto.PortfolioDto;
 import com.company.dto.UserDto;
 import com.company.entity.BaseDbColumn;
 import com.company.repository.BaseDbColumnRepository;
-import com.company.utility.AddressUtility;
-import com.company.utility.BankAccountUtility;
-import com.company.utility.BankOperationUtility;
-import com.company.utility.CompanyUtility;
-import com.company.utility.PortfolioUtility;
-import com.company.utility.PositionUtility;
-import com.company.utility.UserUtility;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.company.utility.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
@@ -40,9 +16,23 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 @ContextConfiguration(classes = {BaseDbColumnService.class, MappingConfiguration.class})
 @ExtendWith(SpringExtension.class)
 class BaseDbColumnServiceTest {
+    @Autowired
+    private BaseDbColumnService baseDbColumnService;
+
     @MockBean
     private AddressUtility addressUtility;
 
@@ -54,9 +44,6 @@ class BaseDbColumnServiceTest {
 
     @MockBean
     private BaseDbColumnRepository baseDbColumnRepository;
-
-    @Autowired
-    private BaseDbColumnService baseDbColumnService;
 
     @MockBean
     private CompanyUtility companyUtility;
@@ -82,16 +69,10 @@ class BaseDbColumnServiceTest {
         when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
         when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
         when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
-        Map<String, List<Map<String, Object>>> actualCache = this.baseDbColumnService.getCache();
+        Map<String, List<Object>> actualCache = this.baseDbColumnService.getCache();
         assertEquals(2, actualCache.size());
-        List<Map<String, Object>> getResult = actualCache.get("investments");
-        assertEquals(2, getResult.size());
-        List<Map<String, Object>> getResult1 = actualCache.get("crm");
-        assertEquals(2, getResult1.size());
-        assertEquals(1, getResult.get(1).size());
-        assertEquals(1, getResult1.get(1).size());
-        assertEquals(1, getResult.get(0).size());
-        assertEquals(1, getResult1.get(0).size());
+        assertEquals(2, actualCache.get("investments").size());
+        assertEquals(2, actualCache.get("crm").size());
         verify(this.userUtility).loadUsers();
         verify(this.portfolioUtility).loadPortfolios();
         verify(this.companyUtility).loadCompanies();
@@ -129,149 +110,11 @@ class BaseDbColumnServiceTest {
     }
 
     /**
-     * Method under test: {@link BaseDbColumnService#flatten(java.util.Collection)}
-     */
-    @Test
-    void testFlatten() {
-        // TODO: Complete this test.
-        //   Reason: R004 No meaningful assertions found.
-        //   Diffblue Cover was unable to create an assertion.
-        //   Make sure that fields modified by flatten(Collection)
-        //   have package-private, protected, or public getters.
-        //   See https://diff.blue/R004 to resolve this issue.
-
-        BaseDbColumnService.flatten(new ArrayList<>());
-    }
-
-    /**
      * Method under test: {@link BaseDbColumnService#getFlattenedJson(Map)}
      */
     @Test
     void testGetFlattenedJson() {
         assertTrue(this.baseDbColumnService.getFlattenedJson(new HashMap<>()).isEmpty());
-    }
-
-    /**
-     * Method under test: {@link BaseDbColumnService#getFlattenedJson(Map)}
-     */
-    @Test
-    void testGetFlattenedJson2() {
-        HashMap<String, List<Map<String, Object>>> stringListMap = new HashMap<>();
-        stringListMap.put("Flattened Json String : {}", new ArrayList<>());
-        assertTrue(this.baseDbColumnService.getFlattenedJson(stringListMap).isEmpty());
-    }
-
-    /**
-     * Method under test: {@link BaseDbColumnService#getFlattenedJson(Map)}
-     */
-    @Test
-    void testGetFlattenedJson3() {
-        HashMap<String, List<Map<String, Object>>> stringListMap = new HashMap<>();
-        stringListMap.put("", new ArrayList<>());
-        assertTrue(this.baseDbColumnService.getFlattenedJson(stringListMap).isEmpty());
-    }
-
-    /**
-     * Method under test: {@link BaseDbColumnService#getFlattenedJson(Map)}
-     */
-    @Test
-    void testGetFlattenedJson4() {
-        HashMap<String, List<Map<String, Object>>> stringListMap = new HashMap<>();
-        stringListMap.put("Key", new ArrayList<>());
-        stringListMap.put("Flattened Json String : {}", new ArrayList<>());
-        assertTrue(this.baseDbColumnService.getFlattenedJson(stringListMap).isEmpty());
-    }
-
-    /**
-     * Method under test: {@link BaseDbColumnService#getFlattenedJson(Map)}
-     */
-    @Test
-    void testGetFlattenedJson5() {
-        ArrayList<Map<String, Object>> mapList = new ArrayList<>();
-        mapList.add(new HashMap<>());
-
-        HashMap<String, List<Map<String, Object>>> stringListMap = new HashMap<>();
-        stringListMap.put("Flattened Json String : {}", mapList);
-        assertTrue(this.baseDbColumnService.getFlattenedJson(stringListMap).isEmpty());
-    }
-
-    /**
-     * Method under test: {@link BaseDbColumnService#getFlattenedJson(Map)}
-     */
-    @Test
-    void testGetFlattenedJson6() {
-        ArrayList<Map<String, Object>> mapList = new ArrayList<>();
-        mapList.add(new HashMap<>());
-        mapList.add(new HashMap<>());
-
-        HashMap<String, List<Map<String, Object>>> stringListMap = new HashMap<>();
-        stringListMap.put("Flattened Json String : {}", mapList);
-        assertTrue(this.baseDbColumnService.getFlattenedJson(stringListMap).isEmpty());
-    }
-
-    /**
-     * Method under test: {@link BaseDbColumnService#getFlattenedJson(Map)}
-     */
-    @Test
-    void testGetFlattenedJson7() {
-        HashMap<String, Object> stringObjectMap = new HashMap<>();
-        stringObjectMap.put("Flattened Json String : {}", "Value");
-
-        ArrayList<Map<String, Object>> mapList = new ArrayList<>();
-        mapList.add(stringObjectMap);
-
-        HashMap<String, List<Map<String, Object>>> stringListMap = new HashMap<>();
-        stringListMap.put("Flattened Json String : {}", mapList);
-        assertEquals(1, this.baseDbColumnService.getFlattenedJson(stringListMap).size());
-    }
-
-    /**
-     * Method under test: {@link BaseDbColumnService#getFlattenedJson(Map)}
-     */
-    @Test
-    void testGetFlattenedJson8() {
-        HashMap<String, Object> stringObjectMap = new HashMap<>();
-        stringObjectMap.put("Flattened Json String : {}", 42);
-
-        ArrayList<Map<String, Object>> mapList = new ArrayList<>();
-        mapList.add(stringObjectMap);
-
-        HashMap<String, List<Map<String, Object>>> stringListMap = new HashMap<>();
-        stringListMap.put("Flattened Json String : {}", mapList);
-        assertEquals(1, this.baseDbColumnService.getFlattenedJson(stringListMap).size());
-    }
-
-    /**
-     * Method under test: {@link BaseDbColumnService#getFlattenedJson(Map)}
-     */
-    @Test
-    void testGetFlattenedJson9() {
-        HashMap<String, Object> stringObjectMap = new HashMap<>();
-        stringObjectMap.put("Flattened Json String : {}", Integer.MIN_VALUE);
-
-        ArrayList<Map<String, Object>> mapList = new ArrayList<>();
-        mapList.add(stringObjectMap);
-
-        HashMap<String, List<Map<String, Object>>> stringListMap = new HashMap<>();
-        stringListMap.put("Flattened Json String : {}", mapList);
-        assertEquals(1, this.baseDbColumnService.getFlattenedJson(stringListMap).size());
-    }
-
-    /**
-     * Method under test: {@link BaseDbColumnService#getFlattenedJson(Map)}
-     */
-    @Test
-    void testGetFlattenedJson10() {
-        HashMap<String, Object> stringObjectMap = new HashMap<>();
-        stringObjectMap.put("Key", "Value");
-        stringObjectMap.put("Flattened Json String : {}", "Value");
-
-        ArrayList<Map<String, Object>> mapList = new ArrayList<>();
-        mapList.add(stringObjectMap);
-
-        HashMap<String, List<Map<String, Object>>> stringListMap = new HashMap<>();
-        stringListMap.put("Flattened Json String : {}", mapList);
-        assertEquals(2, this.baseDbColumnService.getFlattenedJson(stringListMap).size());
     }
 
     /**
@@ -283,16 +126,10 @@ class BaseDbColumnServiceTest {
         when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
         when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
         when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
-        Map<String, List<Map<String, Object>>> actualParseJsonResult = this.baseDbColumnService.parseJson();
+        Map<String, List<Object>> actualParseJsonResult = this.baseDbColumnService.parseJson();
         assertEquals(2, actualParseJsonResult.size());
-        List<Map<String, Object>> getResult = actualParseJsonResult.get("investments");
-        assertEquals(2, getResult.size());
-        List<Map<String, Object>> getResult1 = actualParseJsonResult.get("crm");
-        assertEquals(2, getResult1.size());
-        assertEquals(1, getResult.get(1).size());
-        assertEquals(1, getResult1.get(1).size());
-        assertEquals(1, getResult.get(0).size());
-        assertEquals(1, getResult1.get(0).size());
+        assertEquals(2, actualParseJsonResult.get("investments").size());
+        assertEquals(2, actualParseJsonResult.get("crm").size());
         verify(this.userUtility).loadUsers();
         verify(this.portfolioUtility).loadPortfolios();
         verify(this.companyUtility).loadCompanies();
@@ -324,16 +161,10 @@ class BaseDbColumnServiceTest {
         when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
         when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
         when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
-        Map<String, List<Map<String, Object>>> actualParseJsonResult = this.baseDbColumnService.parseJson();
+        Map<String, List<Object>> actualParseJsonResult = this.baseDbColumnService.parseJson();
         assertEquals(2, actualParseJsonResult.size());
-        List<Map<String, Object>> getResult = actualParseJsonResult.get("investments");
-        assertEquals(2, getResult.size());
-        List<Map<String, Object>> getResult1 = actualParseJsonResult.get("crm");
-        assertEquals(2, getResult1.size());
-        assertEquals(1, getResult.get(1).size());
-        assertEquals(1, getResult1.get(1).size());
-        assertEquals(1, getResult.get(0).size());
-        assertEquals(1, getResult1.get(0).size());
+        assertEquals(2, actualParseJsonResult.get("investments").size());
+        assertEquals(2, actualParseJsonResult.get("crm").size());
         verify(this.userUtility).loadUsers();
         verify(this.portfolioUtility).loadPortfolios();
         verify(this.companyUtility).loadCompanies();
@@ -352,16 +183,10 @@ class BaseDbColumnServiceTest {
         when(this.portfolioUtility.loadPortfolios()).thenReturn(portfolioDtoList);
         when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
         when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
-        Map<String, List<Map<String, Object>>> actualParseJsonResult = this.baseDbColumnService.parseJson();
+        Map<String, List<Object>> actualParseJsonResult = this.baseDbColumnService.parseJson();
         assertEquals(2, actualParseJsonResult.size());
-        List<Map<String, Object>> getResult = actualParseJsonResult.get("investments");
-        assertEquals(2, getResult.size());
-        List<Map<String, Object>> getResult1 = actualParseJsonResult.get("crm");
-        assertEquals(2, getResult1.size());
-        assertEquals(1, getResult.get(1).size());
-        assertEquals(1, getResult1.get(1).size());
-        assertEquals(1, getResult.get(0).size());
-        assertEquals(1, getResult1.get(0).size());
+        assertEquals(2, actualParseJsonResult.get("investments").size());
+        assertEquals(2, actualParseJsonResult.get("crm").size());
         verify(this.userUtility).loadUsers();
         verify(this.portfolioUtility).loadPortfolios();
         verify(this.companyUtility).loadCompanies();
@@ -377,19 +202,13 @@ class BaseDbColumnServiceTest {
         when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
 
         ArrayList<CompanyDto> companyDtoList = new ArrayList<>();
-        companyDtoList.add(new CompanyDto(123L, "42", "portfolio", "portfolio", 1, true));
+        companyDtoList.add(new CompanyDto(123L, "42", "investments", "investments", 1, true));
         when(this.companyUtility.loadCompanies()).thenReturn(companyDtoList);
         when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
-        Map<String, List<Map<String, Object>>> actualParseJsonResult = this.baseDbColumnService.parseJson();
+        Map<String, List<Object>> actualParseJsonResult = this.baseDbColumnService.parseJson();
         assertEquals(2, actualParseJsonResult.size());
-        List<Map<String, Object>> getResult = actualParseJsonResult.get("investments");
-        assertEquals(2, getResult.size());
-        List<Map<String, Object>> getResult1 = actualParseJsonResult.get("crm");
-        assertEquals(2, getResult1.size());
-        assertEquals(1, getResult.get(1).size());
-        assertEquals(1, getResult1.get(1).size());
-        assertEquals(1, getResult.get(0).size());
-        assertEquals(1, getResult1.get(0).size());
+        assertEquals(2, actualParseJsonResult.get("investments").size());
+        assertEquals(2, actualParseJsonResult.get("crm").size());
         verify(this.userUtility).loadUsers();
         verify(this.portfolioUtility).loadPortfolios();
         verify(this.companyUtility).loadCompanies();
@@ -408,16 +227,10 @@ class BaseDbColumnServiceTest {
         ArrayList<BankAccountDto> bankAccountDtoList = new ArrayList<>();
         bankAccountDtoList.add(new BankAccountDto());
         when(this.bankAccountUtility.loadBankAccounts()).thenReturn(bankAccountDtoList);
-        Map<String, List<Map<String, Object>>> actualParseJsonResult = this.baseDbColumnService.parseJson();
+        Map<String, List<Object>> actualParseJsonResult = this.baseDbColumnService.parseJson();
         assertEquals(2, actualParseJsonResult.size());
-        List<Map<String, Object>> getResult = actualParseJsonResult.get("investments");
-        assertEquals(2, getResult.size());
-        List<Map<String, Object>> getResult1 = actualParseJsonResult.get("crm");
-        assertEquals(2, getResult1.size());
-        assertEquals(1, getResult.get(1).size());
-        assertEquals(1, getResult1.get(1).size());
-        assertEquals(1, getResult.get(0).size());
-        assertEquals(1, getResult1.get(0).size());
+        assertEquals(2, actualParseJsonResult.get("investments").size());
+        assertEquals(2, actualParseJsonResult.get("crm").size());
         verify(this.userUtility).loadUsers();
         verify(this.portfolioUtility).loadPortfolios();
         verify(this.companyUtility).loadCompanies();
@@ -436,16 +249,10 @@ class BaseDbColumnServiceTest {
         when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
         when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
         when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
-        Map<String, List<Map<String, Object>>> actualParseJsonResult = this.baseDbColumnService.parseJson();
+        Map<String, List<Object>> actualParseJsonResult = this.baseDbColumnService.parseJson();
         assertEquals(2, actualParseJsonResult.size());
-        List<Map<String, Object>> getResult = actualParseJsonResult.get("investments");
-        assertEquals(2, getResult.size());
-        List<Map<String, Object>> getResult1 = actualParseJsonResult.get("crm");
-        assertEquals(2, getResult1.size());
-        assertEquals(1, getResult.get(1).size());
-        assertEquals(1, getResult1.get(1).size());
-        assertEquals(1, getResult.get(0).size());
-        assertEquals(1, getResult1.get(0).size());
+        assertEquals(2, actualParseJsonResult.get("investments").size());
+        assertEquals(2, actualParseJsonResult.get("crm").size());
         verify(this.userUtility).loadUsers();
         verify(this.portfolioUtility).loadPortfolios();
         verify(this.companyUtility).loadCompanies();
@@ -465,16 +272,10 @@ class BaseDbColumnServiceTest {
         when(this.portfolioUtility.loadPortfolios()).thenReturn(portfolioDtoList);
         when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
         when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
-        Map<String, List<Map<String, Object>>> actualParseJsonResult = this.baseDbColumnService.parseJson();
+        Map<String, List<Object>> actualParseJsonResult = this.baseDbColumnService.parseJson();
         assertEquals(2, actualParseJsonResult.size());
-        List<Map<String, Object>> getResult = actualParseJsonResult.get("investments");
-        assertEquals(2, getResult.size());
-        List<Map<String, Object>> getResult1 = actualParseJsonResult.get("crm");
-        assertEquals(2, getResult1.size());
-        assertEquals(1, getResult.get(1).size());
-        assertEquals(1, getResult1.get(1).size());
-        assertEquals(1, getResult.get(0).size());
-        assertEquals(1, getResult1.get(0).size());
+        assertEquals(2, actualParseJsonResult.get("investments").size());
+        assertEquals(2, actualParseJsonResult.get("crm").size());
         verify(this.userUtility).loadUsers();
         verify(this.portfolioUtility).loadPortfolios();
         verify(this.companyUtility).loadCompanies();
@@ -490,20 +291,14 @@ class BaseDbColumnServiceTest {
         when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
 
         ArrayList<CompanyDto> companyDtoList = new ArrayList<>();
-        companyDtoList.add(new CompanyDto(123L, "42", "portfolio", "portfolio", 1, true));
-        companyDtoList.add(new CompanyDto(123L, "42", "portfolio", "portfolio", 1, true));
+        companyDtoList.add(new CompanyDto(123L, "42", "investments", "investments", 1, true));
+        companyDtoList.add(new CompanyDto(123L, "42", "investments", "investments", 1, true));
         when(this.companyUtility.loadCompanies()).thenReturn(companyDtoList);
         when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
-        Map<String, List<Map<String, Object>>> actualParseJsonResult = this.baseDbColumnService.parseJson();
+        Map<String, List<Object>> actualParseJsonResult = this.baseDbColumnService.parseJson();
         assertEquals(2, actualParseJsonResult.size());
-        List<Map<String, Object>> getResult = actualParseJsonResult.get("investments");
-        assertEquals(2, getResult.size());
-        List<Map<String, Object>> getResult1 = actualParseJsonResult.get("crm");
-        assertEquals(2, getResult1.size());
-        assertEquals(1, getResult.get(1).size());
-        assertEquals(1, getResult1.get(1).size());
-        assertEquals(1, getResult.get(0).size());
-        assertEquals(1, getResult1.get(0).size());
+        assertEquals(2, actualParseJsonResult.get("investments").size());
+        assertEquals(2, actualParseJsonResult.get("crm").size());
         verify(this.userUtility).loadUsers();
         verify(this.portfolioUtility).loadPortfolios();
         verify(this.companyUtility).loadCompanies();
@@ -523,16 +318,10 @@ class BaseDbColumnServiceTest {
         bankAccountDtoList.add(new BankAccountDto());
         bankAccountDtoList.add(new BankAccountDto());
         when(this.bankAccountUtility.loadBankAccounts()).thenReturn(bankAccountDtoList);
-        Map<String, List<Map<String, Object>>> actualParseJsonResult = this.baseDbColumnService.parseJson();
+        Map<String, List<Object>> actualParseJsonResult = this.baseDbColumnService.parseJson();
         assertEquals(2, actualParseJsonResult.size());
-        List<Map<String, Object>> getResult = actualParseJsonResult.get("investments");
-        assertEquals(2, getResult.size());
-        List<Map<String, Object>> getResult1 = actualParseJsonResult.get("crm");
-        assertEquals(2, getResult1.size());
-        assertEquals(1, getResult.get(1).size());
-        assertEquals(1, getResult1.get(1).size());
-        assertEquals(1, getResult.get(0).size());
-        assertEquals(1, getResult1.get(0).size());
+        assertEquals(2, actualParseJsonResult.get("investments").size());
+        assertEquals(2, actualParseJsonResult.get("crm").size());
         verify(this.userUtility).loadUsers();
         verify(this.portfolioUtility).loadPortfolios();
         verify(this.companyUtility).loadCompanies();
@@ -544,24 +333,54 @@ class BaseDbColumnServiceTest {
      */
     @Test
     void testGetGroupedValues() {
-        List<List<String>> actualGroupedValues = this.baseDbColumnService.getGroupedValues();
-        assertEquals(2, actualGroupedValues.size());
-        List<String> getResult = actualGroupedValues.get(0);
-        assertEquals(2, getResult.size());
-        assertEquals("A", getResult.get(0));
-        assertEquals("B", getResult.get(1));
-        List<String> getResult1 = actualGroupedValues.get(1);
-        assertEquals(2, getResult1.size());
-        assertEquals("C", getResult1.get(0));
-        assertEquals("D", getResult1.get(1));
+        List<String> actualGroupedValues = this.baseDbColumnService.getGroupedValues();
+        assertEquals(3, actualGroupedValues.size());
+        assertEquals("A", actualGroupedValues.get(0));
+        assertEquals("B", actualGroupedValues.get(1));
+        assertEquals("C", actualGroupedValues.get(2));
     }
 
     /**
      * Method under test: {@link BaseDbColumnService#createBaseDbColumnsFromDto()}
      */
     @Test
-    void testCreateBaseDbColumnsFromDto() throws ParseException {
+    void testCreateBaseDbColumnsFromDto() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
         when(this.userUtility.loadUsers()).thenReturn(new ArrayList<>());
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
+        when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
+        when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
+        this.baseDbColumnService.createBaseDbColumnsFromDto();
+        verify(this.userUtility).loadUsers();
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.companyUtility).loadCompanies();
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#createBaseDbColumnsFromDto()}
+     */
+    @Test
+    void testCreateBaseDbColumnsFromDto2() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        when(this.userUtility.loadUsers()).thenReturn(new ArrayList<>());
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
+        when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
+        when(this.bankAccountUtility.loadBankAccounts()).thenThrow(new RuntimeException("An error occurred"));
+        assertThrows(RuntimeException.class, () -> this.baseDbColumnService.createBaseDbColumnsFromDto());
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#createBaseDbColumnsFromDto()}
+     */
+    @Test
+    void testCreateBaseDbColumnsFromDto3() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
         when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
         when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
 
@@ -594,8 +413,12 @@ class BaseDbColumnServiceTest {
      * Method under test: {@link BaseDbColumnService#createBaseDbColumnsFromDto()}
      */
     @Test
-    void testCreateBaseDbColumnsFromDto2() throws ParseException {
-        when(this.userUtility.loadUsers()).thenReturn(new ArrayList<>());
+    void testCreateBaseDbColumnsFromDto4() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
         when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
         when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
 
@@ -614,9 +437,13 @@ class BaseDbColumnServiceTest {
         baseDbColumn1.setType("Type");
         when(this.baseDbColumnRepository.findByName((String) any())).thenReturn(baseDbColumn);
         when(this.baseDbColumnRepository.save((BaseDbColumn) any())).thenReturn(baseDbColumn1);
-        when(this.bankAccountUtility.loadBankAccounts()).thenThrow(new RuntimeException("An error occurred"));
-        assertThrows(RuntimeException.class, () -> this.baseDbColumnService.createBaseDbColumnsFromDto());
+        when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
+        this.baseDbColumnService.createBaseDbColumnsFromDto();
+        verify(this.userUtility).loadUsers();
         verify(this.portfolioUtility).loadPortfolios();
+        verify(this.companyUtility).loadCompanies();
+        verify(this.baseDbColumnRepository, atLeast(1)).findByName((String) any());
+        verify(this.baseDbColumnRepository, atLeast(1)).save((BaseDbColumn) any());
         verify(this.bankAccountUtility).loadBankAccounts();
     }
 
@@ -624,13 +451,96 @@ class BaseDbColumnServiceTest {
      * Method under test: {@link BaseDbColumnService#createBaseDbColumnsFromDto()}
      */
     @Test
-    void testCreateBaseDbColumnsFromDto3() throws ParseException {
-        when(this.userUtility.loadUsers()).thenReturn(new ArrayList<>());
+    void testCreateBaseDbColumnsFromDto5() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
+
+        ArrayList<PortfolioDto> portfolioDtoList = new ArrayList<>();
+        portfolioDtoList.add(new PortfolioDto());
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(portfolioDtoList);
+        when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
+
+        BaseDbColumn baseDbColumn = new BaseDbColumn();
+        baseDbColumn.setGroupedValues(new ArrayList<>());
+        baseDbColumn.setId(123L);
+        baseDbColumn.setLabel("Label");
+        baseDbColumn.setName("Name");
+        baseDbColumn.setType("Type");
+
+        BaseDbColumn baseDbColumn1 = new BaseDbColumn();
+        baseDbColumn1.setGroupedValues(new ArrayList<>());
+        baseDbColumn1.setId(123L);
+        baseDbColumn1.setLabel("Label");
+        baseDbColumn1.setName("Name");
+        baseDbColumn1.setType("Type");
+        when(this.baseDbColumnRepository.findByName((String) any())).thenReturn(baseDbColumn);
+        when(this.baseDbColumnRepository.save((BaseDbColumn) any())).thenReturn(baseDbColumn1);
+        when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
+        this.baseDbColumnService.createBaseDbColumnsFromDto();
+        verify(this.userUtility).loadUsers();
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.companyUtility).loadCompanies();
+        verify(this.baseDbColumnRepository, atLeast(1)).findByName((String) any());
+        verify(this.baseDbColumnRepository, atLeast(1)).save((BaseDbColumn) any());
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#createBaseDbColumnsFromDto()}
+     */
+    @Test
+    void testCreateBaseDbColumnsFromDto6() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
+
+        ArrayList<CompanyDto> companyDtoList = new ArrayList<>();
+        companyDtoList.add(new CompanyDto(123L, "42", "investments", "investments", 1, true));
+        when(this.companyUtility.loadCompanies()).thenReturn(companyDtoList);
+
+        BaseDbColumn baseDbColumn = new BaseDbColumn();
+        baseDbColumn.setGroupedValues(new ArrayList<>());
+        baseDbColumn.setId(123L);
+        baseDbColumn.setLabel("Label");
+        baseDbColumn.setName("Name");
+        baseDbColumn.setType("Type");
+
+        BaseDbColumn baseDbColumn1 = new BaseDbColumn();
+        baseDbColumn1.setGroupedValues(new ArrayList<>());
+        baseDbColumn1.setId(123L);
+        baseDbColumn1.setLabel("Label");
+        baseDbColumn1.setName("Name");
+        baseDbColumn1.setType("Type");
+        when(this.baseDbColumnRepository.findByName((String) any())).thenReturn(baseDbColumn);
+        when(this.baseDbColumnRepository.save((BaseDbColumn) any())).thenReturn(baseDbColumn1);
+        when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
+        this.baseDbColumnService.createBaseDbColumnsFromDto();
+        verify(this.userUtility).loadUsers();
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.companyUtility).loadCompanies();
+        verify(this.baseDbColumnRepository, atLeast(1)).findByName((String) any());
+        verify(this.baseDbColumnRepository, atLeast(1)).save((BaseDbColumn) any());
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#createBaseDbColumnsFromDto()}
+     */
+    @Test
+    void testCreateBaseDbColumnsFromDto7() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
         when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
         when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
         BaseDbColumn baseDbColumn = mock(BaseDbColumn.class);
         when(baseDbColumn.getId()).thenReturn(123L);
-        doNothing().when(baseDbColumn).setGroupedValues((List<List<String>>) any());
+        doNothing().when(baseDbColumn).setGroupedValues((List<String>) any());
         doNothing().when(baseDbColumn).setId(anyLong());
         doNothing().when(baseDbColumn).setLabel((String) any());
         doNothing().when(baseDbColumn).setName((String) any());
@@ -657,7 +567,511 @@ class BaseDbColumnServiceTest {
         verify(this.baseDbColumnRepository, atLeast(1)).findByName((String) any());
         verify(this.baseDbColumnRepository, atLeast(1)).save((BaseDbColumn) any());
         verify(baseDbColumn, atLeast(1)).getId();
-        verify(baseDbColumn).setGroupedValues((List<List<String>>) any());
+        verify(baseDbColumn).setGroupedValues((List<String>) any());
+        verify(baseDbColumn).setId(anyLong());
+        verify(baseDbColumn).setLabel((String) any());
+        verify(baseDbColumn).setName((String) any());
+        verify(baseDbColumn).setType((String) any());
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#createBaseDbColumnsFromDto()}
+     */
+    @Test
+    void testCreateBaseDbColumnsFromDto8() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
+        when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
+        BaseDbColumn baseDbColumn = mock(BaseDbColumn.class);
+        when(baseDbColumn.getId()).thenReturn(123L);
+        doNothing().when(baseDbColumn).setGroupedValues((List<String>) any());
+        doNothing().when(baseDbColumn).setId(anyLong());
+        doNothing().when(baseDbColumn).setLabel((String) any());
+        doNothing().when(baseDbColumn).setName((String) any());
+        doNothing().when(baseDbColumn).setType((String) any());
+        baseDbColumn.setGroupedValues(new ArrayList<>());
+        baseDbColumn.setId(123L);
+        baseDbColumn.setLabel("Label");
+        baseDbColumn.setName("Name");
+        baseDbColumn.setType("Type");
+
+        BaseDbColumn baseDbColumn1 = new BaseDbColumn();
+        baseDbColumn1.setGroupedValues(new ArrayList<>());
+        baseDbColumn1.setId(123L);
+        baseDbColumn1.setLabel("Label");
+        baseDbColumn1.setName("Name");
+        baseDbColumn1.setType("Type");
+        when(this.baseDbColumnRepository.findByName((String) any())).thenReturn(baseDbColumn);
+        when(this.baseDbColumnRepository.save((BaseDbColumn) any())).thenReturn(baseDbColumn1);
+
+        ArrayList<BankAccountDto> bankAccountDtoList = new ArrayList<>();
+        bankAccountDtoList.add(new BankAccountDto());
+        when(this.bankAccountUtility.loadBankAccounts()).thenReturn(bankAccountDtoList);
+        this.baseDbColumnService.createBaseDbColumnsFromDto();
+        verify(this.userUtility).loadUsers();
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.companyUtility).loadCompanies();
+        verify(this.baseDbColumnRepository, atLeast(1)).findByName((String) any());
+        verify(this.baseDbColumnRepository, atLeast(1)).save((BaseDbColumn) any());
+        verify(baseDbColumn, atLeast(1)).getId();
+        verify(baseDbColumn).setGroupedValues((List<String>) any());
+        verify(baseDbColumn).setId(anyLong());
+        verify(baseDbColumn).setLabel((String) any());
+        verify(baseDbColumn).setName((String) any());
+        verify(baseDbColumn).setType((String) any());
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#getAllExistingDtoInsidePackage()}
+     */
+    @Test
+    void testGetAllExistingDtoInsidePackage() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        assertEquals(7, this.baseDbColumnService.getAllExistingDtoInsidePackage().size());
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#convertObjectToList(Object)}
+     */
+    @Test
+    void testConvertObjectToList() {
+        assertTrue(BaseDbColumnService.convertObjectToList("Obj").isEmpty());
+        assertTrue(BaseDbColumnService.convertObjectToList(new ArrayList<>()).isEmpty());
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#getCacheKeys(java.util.Map)}
+     */
+    @Test
+    void testGetCacheKeys() {
+        assertTrue(this.baseDbColumnService.getCacheKeys(new HashMap<>()).isEmpty());
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#getCacheValues(java.util.Map)}
+     */
+    @Test
+    void testGetCacheValues() {
+        assertTrue(this.baseDbColumnService.getCacheValues(new HashMap<>()).isEmpty());
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#getListBaseDbColumns()}
+     */
+    @Test
+    void testGetListBaseDbColumns() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        when(this.userUtility.loadUsers()).thenReturn(new ArrayList<>());
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
+        when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
+        when(this.bankAccountUtility.loadBankAccounts()).thenThrow(new RuntimeException("An error occurred"));
+        assertThrows(RuntimeException.class, () -> this.baseDbColumnService.getListBaseDbColumns());
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#getListBaseDbColumns()}
+     */
+    @Test
+    void testGetListBaseDbColumns2() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
+        when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
+
+        BaseDbColumn baseDbColumn = new BaseDbColumn();
+        baseDbColumn.setGroupedValues(new ArrayList<>());
+        baseDbColumn.setId(123L);
+        baseDbColumn.setLabel("Label");
+        baseDbColumn.setName("Name");
+        baseDbColumn.setType("Type");
+
+        BaseDbColumn baseDbColumn1 = new BaseDbColumn();
+        baseDbColumn1.setGroupedValues(new ArrayList<>());
+        baseDbColumn1.setId(123L);
+        baseDbColumn1.setLabel("Label");
+        baseDbColumn1.setName("Name");
+        baseDbColumn1.setType("Type");
+        when(this.baseDbColumnRepository.findByName((String) any())).thenReturn(baseDbColumn);
+        when(this.baseDbColumnRepository.save((BaseDbColumn) any())).thenReturn(baseDbColumn1);
+        when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
+        List<BaseDbColumn> actualListBaseDbColumns = this.baseDbColumnService.getListBaseDbColumns();
+        BaseDbColumn getResult = actualListBaseDbColumns.get(3545);
+        assertEquals("userId", getResult.getName());
+        assertEquals("userId", getResult.getLabel());
+        assertEquals(123L, getResult.getId());
+        BaseDbColumn getResult1 = actualListBaseDbColumns.get(3544);
+        assertEquals("userFirstName", getResult1.getName());
+        assertEquals("userFirstName", getResult1.getLabel());
+        assertEquals(123L, getResult1.getId());
+        BaseDbColumn getResult2 = actualListBaseDbColumns.get(3543);
+        assertEquals("email", getResult2.getName());
+        assertEquals("email", getResult2.getLabel());
+        assertEquals(123L, getResult2.getId());
+        BaseDbColumn getResult3 = actualListBaseDbColumns.get(3542);
+        assertEquals("mobileNumbers", getResult3.getName());
+        assertEquals("mobileNumbers", getResult3.getLabel());
+        assertEquals(123L, getResult3.getId());
+        BaseDbColumn getResult4 = actualListBaseDbColumns.get(3546);
+        assertEquals("userLastName", getResult4.getName());
+        assertEquals("userLastName", getResult4.getLabel());
+        assertEquals(123L, getResult4.getId());
+        assertEquals("java.util.List<java.lang.String>", getResult3.getType());
+        assertEquals("java.lang.String", getResult4.getType());
+        assertEquals("java.lang.String", getResult.getType());
+        assertEquals("java.lang.String", getResult1.getType());
+        assertEquals("java.lang.String", getResult2.getType());
+        verify(this.userUtility).loadUsers();
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.companyUtility).loadCompanies();
+        verify(this.baseDbColumnRepository, atLeast(1)).findByName((String) any());
+        verify(this.baseDbColumnRepository, atLeast(1)).save((BaseDbColumn) any());
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#getListBaseDbColumns()}
+     */
+    @Test
+    void testGetListBaseDbColumns3() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
+        when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
+
+        BaseDbColumn baseDbColumn = new BaseDbColumn();
+        baseDbColumn.setGroupedValues(new ArrayList<>());
+        baseDbColumn.setId(123L);
+        baseDbColumn.setLabel("Label");
+        baseDbColumn.setName("Name");
+        baseDbColumn.setType("Type");
+
+        BaseDbColumn baseDbColumn1 = new BaseDbColumn();
+        baseDbColumn1.setGroupedValues(new ArrayList<>());
+        baseDbColumn1.setId(123L);
+        baseDbColumn1.setLabel("Label");
+        baseDbColumn1.setName("Name");
+        baseDbColumn1.setType("Type");
+        when(this.baseDbColumnRepository.findByName((String) any())).thenReturn(baseDbColumn);
+        when(this.baseDbColumnRepository.save((BaseDbColumn) any())).thenReturn(baseDbColumn1);
+        when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
+        List<BaseDbColumn> actualListBaseDbColumns = this.baseDbColumnService.getListBaseDbColumns();
+        BaseDbColumn getResult = actualListBaseDbColumns.get(3566);
+        assertEquals("userId", getResult.getName());
+        assertEquals("userId", getResult.getLabel());
+        assertEquals(123L, getResult.getId());
+        BaseDbColumn getResult1 = actualListBaseDbColumns.get(3565);
+        assertEquals("userFirstName", getResult1.getName());
+        assertEquals("userFirstName", getResult1.getLabel());
+        assertEquals(123L, getResult1.getId());
+        BaseDbColumn getResult2 = actualListBaseDbColumns.get(3564);
+        assertEquals("email", getResult2.getName());
+        assertEquals("email", getResult2.getLabel());
+        assertEquals(123L, getResult2.getId());
+        BaseDbColumn getResult3 = actualListBaseDbColumns.get(3563);
+        assertEquals("mobileNumbers", getResult3.getName());
+        assertEquals("mobileNumbers", getResult3.getLabel());
+        assertEquals(123L, getResult3.getId());
+        BaseDbColumn getResult4 = actualListBaseDbColumns.get(3567);
+        assertEquals("userLastName", getResult4.getName());
+        assertEquals("userLastName", getResult4.getLabel());
+        assertEquals(123L, getResult4.getId());
+        assertEquals("java.util.List<java.lang.String>", getResult3.getType());
+        assertEquals("java.lang.String", getResult4.getType());
+        assertEquals("java.lang.String", getResult.getType());
+        assertEquals("java.lang.String", getResult1.getType());
+        assertEquals("java.lang.String", getResult2.getType());
+        verify(this.userUtility).loadUsers();
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.companyUtility).loadCompanies();
+        verify(this.baseDbColumnRepository, atLeast(1)).findByName((String) any());
+        verify(this.baseDbColumnRepository, atLeast(1)).save((BaseDbColumn) any());
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#getListBaseDbColumns()}
+     */
+    @Test
+    void testGetListBaseDbColumns4() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
+
+        ArrayList<PortfolioDto> portfolioDtoList = new ArrayList<>();
+        portfolioDtoList.add(new PortfolioDto());
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(portfolioDtoList);
+        when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
+
+        BaseDbColumn baseDbColumn = new BaseDbColumn();
+        baseDbColumn.setGroupedValues(new ArrayList<>());
+        baseDbColumn.setId(123L);
+        baseDbColumn.setLabel("Label");
+        baseDbColumn.setName("Name");
+        baseDbColumn.setType("Type");
+
+        BaseDbColumn baseDbColumn1 = new BaseDbColumn();
+        baseDbColumn1.setGroupedValues(new ArrayList<>());
+        baseDbColumn1.setId(123L);
+        baseDbColumn1.setLabel("Label");
+        baseDbColumn1.setName("Name");
+        baseDbColumn1.setType("Type");
+        when(this.baseDbColumnRepository.findByName((String) any())).thenReturn(baseDbColumn);
+        when(this.baseDbColumnRepository.save((BaseDbColumn) any())).thenReturn(baseDbColumn1);
+        when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
+        List<BaseDbColumn> actualListBaseDbColumns = this.baseDbColumnService.getListBaseDbColumns();
+        BaseDbColumn getResult = actualListBaseDbColumns.get(3595);
+        assertEquals("userId", getResult.getName());
+        assertEquals("userId", getResult.getLabel());
+        assertEquals(123L, getResult.getId());
+        BaseDbColumn getResult1 = actualListBaseDbColumns.get(3594);
+        assertEquals("userFirstName", getResult1.getName());
+        assertEquals("userFirstName", getResult1.getLabel());
+        assertEquals(123L, getResult1.getId());
+        BaseDbColumn getResult2 = actualListBaseDbColumns.get(3593);
+        assertEquals("email", getResult2.getName());
+        assertEquals("email", getResult2.getLabel());
+        assertEquals(123L, getResult2.getId());
+        BaseDbColumn getResult3 = actualListBaseDbColumns.get(3592);
+        assertEquals("mobileNumbers", getResult3.getName());
+        assertEquals("mobileNumbers", getResult3.getLabel());
+        assertEquals(123L, getResult3.getId());
+        BaseDbColumn getResult4 = actualListBaseDbColumns.get(3596);
+        assertEquals("userLastName", getResult4.getName());
+        assertEquals("userLastName", getResult4.getLabel());
+        assertEquals(123L, getResult4.getId());
+        assertEquals("java.util.List<java.lang.String>", getResult3.getType());
+        assertEquals("java.lang.String", getResult4.getType());
+        assertEquals("java.lang.String", getResult.getType());
+        assertEquals("java.lang.String", getResult1.getType());
+        assertEquals("java.lang.String", getResult2.getType());
+        verify(this.userUtility).loadUsers();
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.companyUtility).loadCompanies();
+        verify(this.baseDbColumnRepository, atLeast(1)).findByName((String) any());
+        verify(this.baseDbColumnRepository, atLeast(1)).save((BaseDbColumn) any());
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#getListBaseDbColumns()}
+     */
+    @Test
+    void testGetListBaseDbColumns5() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
+
+        ArrayList<CompanyDto> companyDtoList = new ArrayList<>();
+        companyDtoList.add(new CompanyDto(123L, "42", "investments", "investments", 1, true));
+        when(this.companyUtility.loadCompanies()).thenReturn(companyDtoList);
+
+        BaseDbColumn baseDbColumn = new BaseDbColumn();
+        baseDbColumn.setGroupedValues(new ArrayList<>());
+        baseDbColumn.setId(123L);
+        baseDbColumn.setLabel("Label");
+        baseDbColumn.setName("Name");
+        baseDbColumn.setType("Type");
+
+        BaseDbColumn baseDbColumn1 = new BaseDbColumn();
+        baseDbColumn1.setGroupedValues(new ArrayList<>());
+        baseDbColumn1.setId(123L);
+        baseDbColumn1.setLabel("Label");
+        baseDbColumn1.setName("Name");
+        baseDbColumn1.setType("Type");
+        when(this.baseDbColumnRepository.findByName((String) any())).thenReturn(baseDbColumn);
+        when(this.baseDbColumnRepository.save((BaseDbColumn) any())).thenReturn(baseDbColumn1);
+        when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
+        List<BaseDbColumn> actualListBaseDbColumns = this.baseDbColumnService.getListBaseDbColumns();
+        BaseDbColumn getResult = actualListBaseDbColumns.get(3638);
+        assertEquals("yearOfEstablishment", getResult.getName());
+        assertEquals("yearOfEstablishment", getResult.getLabel());
+        assertEquals(123L, getResult.getId());
+        BaseDbColumn getResult1 = actualListBaseDbColumns.get(3637);
+        assertEquals("domicile", getResult1.getName());
+        assertEquals("domicile", getResult1.getLabel());
+        assertEquals(123L, getResult1.getId());
+        BaseDbColumn getResult2 = actualListBaseDbColumns.get(3636);
+        assertEquals("companyName", getResult2.getName());
+        assertEquals("companyName", getResult2.getLabel());
+        assertEquals(123L, getResult2.getId());
+        BaseDbColumn getResult3 = actualListBaseDbColumns.get(3635);
+        assertEquals("companyId", getResult3.getName());
+        assertEquals("companyId", getResult3.getLabel());
+        assertEquals(123L, getResult3.getId());
+        BaseDbColumn getResult4 = actualListBaseDbColumns.get(3639);
+        assertEquals("isActive", getResult4.getName());
+        assertEquals("isActive", getResult4.getLabel());
+        assertEquals(123L, getResult4.getId());
+        assertEquals("java.lang.String", getResult3.getType());
+        assertEquals("boolean", getResult4.getType());
+        assertEquals("int", getResult.getType());
+        assertEquals("java.lang.String", getResult1.getType());
+        assertEquals("java.lang.String", getResult2.getType());
+        verify(this.userUtility).loadUsers();
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.companyUtility).loadCompanies();
+        verify(this.baseDbColumnRepository, atLeast(1)).findByName((String) any());
+        verify(this.baseDbColumnRepository, atLeast(1)).save((BaseDbColumn) any());
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#getListBaseDbColumns()}
+     */
+    @Test
+    void testGetListBaseDbColumns6() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
+        when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
+        BaseDbColumn baseDbColumn = mock(BaseDbColumn.class);
+        when(baseDbColumn.getId()).thenReturn(123L);
+        doNothing().when(baseDbColumn).setGroupedValues((List<String>) any());
+        doNothing().when(baseDbColumn).setId(anyLong());
+        doNothing().when(baseDbColumn).setLabel((String) any());
+        doNothing().when(baseDbColumn).setName((String) any());
+        doNothing().when(baseDbColumn).setType((String) any());
+        baseDbColumn.setGroupedValues(new ArrayList<>());
+        baseDbColumn.setId(123L);
+        baseDbColumn.setLabel("Label");
+        baseDbColumn.setName("Name");
+        baseDbColumn.setType("Type");
+
+        BaseDbColumn baseDbColumn1 = new BaseDbColumn();
+        baseDbColumn1.setGroupedValues(new ArrayList<>());
+        baseDbColumn1.setId(123L);
+        baseDbColumn1.setLabel("Label");
+        baseDbColumn1.setName("Name");
+        baseDbColumn1.setType("Type");
+        when(this.baseDbColumnRepository.findByName((String) any())).thenReturn(baseDbColumn);
+        when(this.baseDbColumnRepository.save((BaseDbColumn) any())).thenReturn(baseDbColumn1);
+        when(this.bankAccountUtility.loadBankAccounts()).thenReturn(new ArrayList<>());
+        List<BaseDbColumn> actualListBaseDbColumns = this.baseDbColumnService.getListBaseDbColumns();
+        BaseDbColumn getResult = actualListBaseDbColumns.get(3671);
+        assertEquals("userId", getResult.getName());
+        assertEquals("userId", getResult.getLabel());
+        assertEquals(123L, getResult.getId());
+        BaseDbColumn getResult1 = actualListBaseDbColumns.get(3670);
+        assertEquals("userFirstName", getResult1.getName());
+        assertEquals("userFirstName", getResult1.getLabel());
+        assertEquals(123L, getResult1.getId());
+        BaseDbColumn getResult2 = actualListBaseDbColumns.get(3669);
+        assertEquals("email", getResult2.getName());
+        assertEquals("email", getResult2.getLabel());
+        assertEquals(123L, getResult2.getId());
+        BaseDbColumn getResult3 = actualListBaseDbColumns.get(3668);
+        assertEquals("mobileNumbers", getResult3.getName());
+        assertEquals("mobileNumbers", getResult3.getLabel());
+        assertEquals(123L, getResult3.getId());
+        BaseDbColumn getResult4 = actualListBaseDbColumns.get(3672);
+        assertEquals("userLastName", getResult4.getName());
+        assertEquals("userLastName", getResult4.getLabel());
+        assertEquals(123L, getResult4.getId());
+        assertEquals("java.util.List<java.lang.String>", getResult3.getType());
+        assertEquals("java.lang.String", getResult4.getType());
+        assertEquals("java.lang.String", getResult.getType());
+        assertEquals("java.lang.String", getResult1.getType());
+        assertEquals("java.lang.String", getResult2.getType());
+        verify(this.userUtility).loadUsers();
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.companyUtility).loadCompanies();
+        verify(this.baseDbColumnRepository, atLeast(1)).findByName((String) any());
+        verify(this.baseDbColumnRepository, atLeast(1)).save((BaseDbColumn) any());
+        verify(baseDbColumn, atLeast(1)).getId();
+        verify(baseDbColumn).setGroupedValues((List<String>) any());
+        verify(baseDbColumn).setId(anyLong());
+        verify(baseDbColumn).setLabel((String) any());
+        verify(baseDbColumn).setName((String) any());
+        verify(baseDbColumn).setType((String) any());
+        verify(this.bankAccountUtility).loadBankAccounts();
+    }
+
+    /**
+     * Method under test: {@link BaseDbColumnService#getListBaseDbColumns()}
+     */
+    @Test
+    void testGetListBaseDbColumns7() throws IOException, ClassNotFoundException, IllegalAccessException,
+            InstantiationException, NoSuchMethodException, InvocationTargetException, ParseException {
+        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        userDtoList.add(new UserDto());
+        when(this.userUtility.loadUsers()).thenReturn(userDtoList);
+        when(this.portfolioUtility.loadPortfolios()).thenReturn(new ArrayList<>());
+        when(this.companyUtility.loadCompanies()).thenReturn(new ArrayList<>());
+        BaseDbColumn baseDbColumn = mock(BaseDbColumn.class);
+        when(baseDbColumn.getId()).thenReturn(123L);
+        doNothing().when(baseDbColumn).setGroupedValues((List<String>) any());
+        doNothing().when(baseDbColumn).setId(anyLong());
+        doNothing().when(baseDbColumn).setLabel((String) any());
+        doNothing().when(baseDbColumn).setName((String) any());
+        doNothing().when(baseDbColumn).setType((String) any());
+        baseDbColumn.setGroupedValues(new ArrayList<>());
+        baseDbColumn.setId(123L);
+        baseDbColumn.setLabel("Label");
+        baseDbColumn.setName("Name");
+        baseDbColumn.setType("Type");
+
+        BaseDbColumn baseDbColumn1 = new BaseDbColumn();
+        baseDbColumn1.setGroupedValues(new ArrayList<>());
+        baseDbColumn1.setId(123L);
+        baseDbColumn1.setLabel("Label");
+        baseDbColumn1.setName("Name");
+        baseDbColumn1.setType("Type");
+        when(this.baseDbColumnRepository.findByName((String) any())).thenReturn(baseDbColumn);
+        when(this.baseDbColumnRepository.save((BaseDbColumn) any())).thenReturn(baseDbColumn1);
+
+        ArrayList<BankAccountDto> bankAccountDtoList = new ArrayList<>();
+        bankAccountDtoList.add(new BankAccountDto());
+        when(this.bankAccountUtility.loadBankAccounts()).thenReturn(bankAccountDtoList);
+        List<BaseDbColumn> actualListBaseDbColumns = this.baseDbColumnService.getListBaseDbColumns();
+        BaseDbColumn getResult = actualListBaseDbColumns.get(3698);
+        assertEquals("userId", getResult.getName());
+        assertEquals("userId", getResult.getLabel());
+        assertEquals(123L, getResult.getId());
+        BaseDbColumn getResult1 = actualListBaseDbColumns.get(3697);
+        assertEquals("userFirstName", getResult1.getName());
+        assertEquals("userFirstName", getResult1.getLabel());
+        assertEquals(123L, getResult1.getId());
+        BaseDbColumn getResult2 = actualListBaseDbColumns.get(3696);
+        assertEquals("email", getResult2.getName());
+        assertEquals("email", getResult2.getLabel());
+        assertEquals(123L, getResult2.getId());
+        BaseDbColumn getResult3 = actualListBaseDbColumns.get(3695);
+        assertEquals("mobileNumbers", getResult3.getName());
+        assertEquals("mobileNumbers", getResult3.getLabel());
+        assertEquals(123L, getResult3.getId());
+        BaseDbColumn getResult4 = actualListBaseDbColumns.get(3699);
+        assertEquals("userLastName", getResult4.getName());
+        assertEquals("userLastName", getResult4.getLabel());
+        assertEquals(123L, getResult4.getId());
+        assertEquals("java.util.List<java.lang.String>", getResult3.getType());
+        assertEquals("java.lang.String", getResult4.getType());
+        assertEquals("java.lang.String", getResult.getType());
+        assertEquals("java.lang.String", getResult1.getType());
+        assertEquals("java.lang.String", getResult2.getType());
+        verify(this.userUtility).loadUsers();
+        verify(this.portfolioUtility).loadPortfolios();
+        verify(this.companyUtility).loadCompanies();
+        verify(this.baseDbColumnRepository, atLeast(1)).findByName((String) any());
+        verify(this.baseDbColumnRepository, atLeast(1)).save((BaseDbColumn) any());
+        verify(baseDbColumn, atLeast(1)).getId();
+        verify(baseDbColumn).setGroupedValues((List<String>) any());
         verify(baseDbColumn).setId(anyLong());
         verify(baseDbColumn).setLabel((String) any());
         verify(baseDbColumn).setName((String) any());
